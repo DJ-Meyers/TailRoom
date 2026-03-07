@@ -1,3 +1,5 @@
+import { Typeahead } from './Typeahead';
+
 interface Props {
   value: string;
   onChange: (ability: string) => void;
@@ -6,19 +8,13 @@ interface Props {
 
 export function AbilitySelector({ value, onChange, abilities }: Props) {
   return (
-    <div className="selector">
-      <label htmlFor="ability-select">Ability</label>
-      <select
-        id="ability-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {abilities.map((name) => (
-          <option key={name} value={name}>
-            {name}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Typeahead
+      id="ability-select"
+      label="Ability"
+      value={value}
+      onChange={onChange}
+      options={abilities}
+      placeholder="Search abilities..."
+    />
   );
 }

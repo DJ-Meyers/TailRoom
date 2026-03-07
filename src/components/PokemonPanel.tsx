@@ -1,4 +1,5 @@
 import type { StatKey, ParseResult } from '../types';
+import type { ParseContext } from '../parser';
 import { PokemonSelector } from './PokemonSelector';
 import { NatureSelector } from './NatureSelector';
 import { AbilitySelector } from './AbilitySelector';
@@ -6,6 +7,7 @@ import { ItemSelector } from './ItemSelector';
 import { MoveSelector } from './MoveSelector';
 import { StatInputs } from './StatInputs';
 import { ParseInput } from './ParseInput';
+import { Typeahead } from './Typeahead';
 import type { PokemonState } from '../types';
 
 const TYPE_NAMES = [
@@ -14,15 +16,15 @@ const TYPE_NAMES = [
   'Electric', 'Psychic', 'Ice', 'Dragon', 'Dark', 'Fairy', 'Stellar',
 ];
 
-const STATUS_OPTIONS = [
-  { value: '', label: '(none)' },
-  { value: 'brn', label: 'Burned' },
-  { value: 'par', label: 'Paralyzed' },
-  { value: 'psn', label: 'Poisoned' },
-  { value: 'tox', label: 'Badly Poisoned' },
-  { value: 'slp', label: 'Asleep' },
-  { value: 'frz', label: 'Frozen' },
-];
+const STATUS_VALUES = ['brn', 'par', 'psn', 'tox', 'slp', 'frz'];
+const STATUS_LABELS: Record<string, string> = {
+  brn: 'Burned',
+  par: 'Paralyzed',
+  psn: 'Poisoned',
+  tox: 'Badly Poisoned',
+  slp: 'Asleep',
+  frz: 'Frozen',
+};
 
 interface Props {
   label: string;
@@ -41,6 +43,7 @@ interface Props {
   onStatusChange: (status: string) => void;
   onIsCritChange: (isCrit: boolean) => void;
   onParsed: (result: ParseResult) => void;
+  parseContext?: ParseContext;
 }
 
 export function PokemonPanel({
@@ -60,11 +63,12 @@ export function PokemonPanel({
   onStatusChange,
   onIsCritChange,
   onParsed,
+  parseContext,
 }: Props) {
   return (
     <div className="pokemon-panel">
       <h2>{label}</h2>
-      <ParseInput onParsed={onParsed} label={label.toLowerCase()} />
+      <ParseInput onParsed={onParsed} label={label.toLowerCase()} parseContext={parseContext} />
       <PokemonSelector
         id={`${label.toLowerCase()}-species`}
         value={state.species}
@@ -78,24 +82,28 @@ export function PokemonPanel({
       />
       <ItemSelector value={state.item} onChange={onItemChange} />
 
-      <div className="selector">
-        <label>Tera Type</label>
-        <select value={state.teraType} onChange={(e) => onTeraTypeChange(e.target.value)}>
-          <option value="">(none)</option>
-          {TYPE_NAMES.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </div>
+      <Typeahead
+        id={`${label.toLowerCase()}-tera-type`}
+        label="Tera Type"
+        value={state.teraType}
+        onChange={onTeraTypeChange}
+        options={TYPE_NAMES}
+        placeholder="Search types..."
+        allowEmpty
+        emptyLabel="(none)"
+      />
 
-      <div className="selector">
-        <label>Status</label>
-        <select value={state.status} onChange={(e) => onStatusChange(e.target.value)}>
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
-      </div>
+      <Typeahead
+        id={`${label.toLowerCase()}-status`}
+        label="Status"
+        value={state.status}
+        onChange={onStatusChange}
+        options={STATUS_VALUES}
+        placeholder="Search status..."
+        allowEmpty
+        emptyLabel="(none)"
+        getLabel={(v) => STATUS_LABELS[v] ?? v}
+      />
 
       {showMove && (
         <>

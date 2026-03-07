@@ -12,7 +12,7 @@ export function usePokemon(initialSpecies: string, initialMove: string) {
     const abilities = getSpeciesAbilities(initialSpecies);
     return {
       species: initialSpecies,
-      level: 100,
+      level: 50,
       nature: 'Hardy',
       ability: abilities[0] ?? '',
       item: '',
@@ -24,6 +24,7 @@ export function usePokemon(initialSpecies: string, initialMove: string) {
       status: '',
       isCrit: false,
       abilityOn: false,
+      boostedStat: '',
     };
   });
 
@@ -114,6 +115,7 @@ export function usePokemon(initialSpecies: string, initialMove: string) {
       if (parsed.status !== undefined) next.status = parsed.status;
       if (parsed.isCrit !== undefined) next.isCrit = parsed.isCrit;
       if (parsed.abilityOn !== undefined) next.abilityOn = parsed.abilityOn;
+      if (parsed.boostedStat !== undefined) next.boostedStat = parsed.boostedStat;
 
       if (parsed.evs) {
         const newEvs = defaultEvs();

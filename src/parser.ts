@@ -1,6 +1,6 @@
 import { toID } from '@smogon/calc';
 import { gen } from './data/gen';
-import type { ParseResult, StatKey } from './types';
+import type { FieldConditions, ParseResult, StatKey } from './types';
 
 // --- Lookup maps (built once from gen data) ---
 
@@ -117,6 +117,55 @@ const ABILITY_ON_LIST = new Set([
   'Sword of Ruin', 'Beads of Ruin', 'Tablets of Ruin', 'Vessel of Ruin',
 ]);
 
+// --- Field condition keywords ---
+
+const RUIN_PHRASES: Record<string, keyof FieldConditions> = {
+  'beads of ruin': 'isBeadsOfRuin',
+  'sword of ruin': 'isSwordOfRuin',
+  'tablets of ruin': 'isTabletsOfRuin',
+  'vessel of ruin': 'isVesselOfRuin',
+};
+
+const TERRAIN_PHRASES: Record<string, FieldConditions['terrain']> = {
+  'psychic terrain': 'Psychic',
+  'electric terrain': 'Electric',
+  'grassy terrain': 'Grassy',
+  'misty terrain': 'Misty',
+};
+
+const SIDE_CONDITION_PHRASES: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
+  'helping hand': { field: 'attackerSide', key: 'isHelpingHand' },
+  'light screen': { field: 'defenderSide', key: 'isLightScreen' },
+  'aurora veil': { field: 'defenderSide', key: 'isAuroraVeil' },
+  'friend guard': { field: 'defenderSide', key: 'isFriendGuard' },
+};
+
+const WEATHER_KEYWORDS: Record<string, FieldConditions['weather']> = {
+  sun: 'Sun', sunny: 'Sun',
+  rain: 'Rain', rainy: 'Rain',
+  sand: 'Sand', sandstorm: 'Sand',
+  snow: 'Snow',
+  hail: 'Hail',
+};
+
+const SINGLE_SIDE_CONDITIONS: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
+  reflect: { field: 'defenderSide', key: 'isReflect' },
+  tailwind: { field: 'attackerSide', key: 'isTailwind' },
+};
+
+const ABILITY_FIELD_MAP: Record<string, (fc: FieldConditions) => void> = {
+  'Drought': (fc) => { if (!fc.weather) fc.weather = 'Sun'; },
+  'Orichalcum Pulse': (fc) => { if (!fc.weather) fc.weather = 'Sun'; },
+  'Drizzle': (fc) => { if (!fc.weather) fc.weather = 'Rain'; },
+  'Sand Stream': (fc) => { if (!fc.weather) fc.weather = 'Sand'; },
+  'Snow Warning': (fc) => { if (!fc.weather) fc.weather = 'Snow'; },
+  'Hadron Engine': (fc) => { if (!fc.terrain) fc.terrain = 'Electric'; },
+  'Beads of Ruin': (fc) => { fc.isBeadsOfRuin = true; },
+  'Sword of Ruin': (fc) => { fc.isSwordOfRuin = true; },
+  'Tablets of Ruin': (fc) => { fc.isTabletsOfRuin = true; },
+  'Vessel of Ruin': (fc) => { fc.isVesselOfRuin = true; },
+};
+
 // --- Helpers ---
 
 /** Given a move name, return the stat it uses for offense. */
@@ -131,6 +180,23 @@ function getOffensiveStat(moveName: string): StatKey | undefined {
   return undefined;
 }
 
+/** Given a move name, return the stat the defender needs to tank it. */
+function getDefensiveStat(moveName: string): StatKey | undefined {
+  const move = gen.moves.get(toID(moveName));
+  if (!move) return undefined;
+  const override = (move as any).overrideDefensiveStat;
+  if (override) return override as StatKey;
+  if (move.category === 'Physical') return 'def';
+  if (move.category === 'Special') return 'spd';
+  return undefined;
+}
+
+export interface ParseContext {
+  role?: 'attacker' | 'defender';
+  /** The attacker's move (used by defender to resolve deferred stat patterns). */
+  opposingMove?: string;
+}
+
 /** Map an offensive stat to the most common nature boosting it. */
 const OFFENSIVE_NATURE: Partial<Record<StatKey, string>> = {
   atk: 'Adamant',
@@ -139,6 +205,48 @@ const OFFENSIVE_NATURE: Partial<Record<StatKey, string>> = {
   spd: 'Calm',
   spe: 'Jolly',
 };
+
+/** Map (boosted stat, lowered stat) → nature name */
+const NATURE_TABLE: Record<string, string> = {
+  'atk,def': 'Lonely', 'atk,spa': 'Adamant', 'atk,spd': 'Naughty', 'atk,spe': 'Brave',
+  'def,atk': 'Bold', 'def,spa': 'Impish', 'def,spd': 'Lax', 'def,spe': 'Relaxed',
+  'spa,atk': 'Modest', 'spa,def': 'Mild', 'spa,spd': 'Rash', 'spa,spe': 'Quiet',
+  'spd,atk': 'Calm', 'spd,def': 'Gentle', 'spd,spa': 'Careful', 'spd,spe': 'Sassy',
+  'spe,atk': 'Timid', 'spe,def': 'Hasty', 'spe,spa': 'Jolly', 'spe,spd': 'Naive',
+};
+
+/** Default stat to boost when only given a stat to lower (no EV context). */
+const DEFAULT_BOOST_FOR_LOWER: Partial<Record<StatKey, StatKey>> = {
+  atk: 'spa',  // Min Atk → Modest (+SpA -Atk)
+  spa: 'atk',  // Min SpA → Adamant (+Atk -SpA)
+  spe: 'atk',  // Min Spe → Brave (+Atk -Spe)
+  def: 'spe',  // Min Def → Hasty (+Spe -Def)
+  spd: 'spe',  // Min SpD → Naive (+Spe -SpD)
+};
+
+/** Given a stat to lower and an EV spread, pick the best nature. */
+function findNatureForMinStat(
+  lowerStat: StatKey,
+  evs?: Partial<Record<StatKey, number>>,
+): string | undefined {
+  if (lowerStat === 'hp') return undefined; // natures don't affect HP
+
+  // Find the best stat to boost from EVs (highest EV, excluding HP and the lowered stat)
+  let boostStat: StatKey | undefined;
+  if (evs) {
+    let maxEv = 0;
+    for (const [stat, val] of Object.entries(evs) as [StatKey, number][]) {
+      if (stat === 'hp' || stat === lowerStat) continue;
+      if (val > maxEv) { maxEv = val; boostStat = stat; }
+    }
+  }
+
+  // Fall back to a sensible default
+  if (!boostStat) boostStat = DEFAULT_BOOST_FOR_LOWER[lowerStat];
+  if (!boostStat) return undefined;
+
+  return NATURE_TABLE[`${boostStat},${lowerStat}`];
+}
 
 function resolveStat(token: string): StatKey | undefined {
   return STAT_ALIASES[toID(token)];
@@ -206,12 +314,14 @@ function inferNature(evs: Partial<Record<StatKey, number>>): string | undefined 
 
 // --- Main parser ---
 
-export function parseInput(input: string): ParseResult {
+export function parseInput(input: string, context?: ParseContext): ParseResult {
   const tokens = input.trim().split(/\s+/).filter(Boolean);
   const consumed = new Array<boolean>(tokens.length).fill(false);
   const result: ParseResult = { unmatched: [] };
   let deferredMaxPlus = false; // "252+" or "max+" — resolve after move is known
   let deferredBoost: number | null = null; // standalone "+2" etc. — resolve after move is known
+  let deferredNature: string | undefined; // nature implied by "252+ <Stat>" — defer so explicit natures win
+  let deferredMinStat: StatKey | undefined; // "Min <Stat>" — resolve nature after EVs are known
 
   // --- Pass 1: Structural patterns ---
 
@@ -219,8 +329,20 @@ export function parseInput(input: string): ParseResult {
     if (consumed[i]) continue;
     const lower = tokens[i].toLowerCase();
 
-    // "252+" or "max+" — max EVs + boosting nature in the move's offensive stat
+    // "252+" or "max+" — max EVs + boosting nature
+    // If followed by a stat name (e.g. "252+ SpA"), resolve immediately; otherwise defer to move
     if (/^\d+\+$/.test(tokens[i]) || lower === 'max+') {
+      const evValue = lower === 'max+' ? 252 : Math.min(parseInt(tokens[i], 10), 252);
+      if (i + 1 < tokens.length && !consumed[i + 1]) {
+        const stat = resolveStat(tokens[i + 1]);
+        if (stat && stat !== 'hp') {
+          if (!result.evs) result.evs = {};
+          result.evs[stat] = evValue;
+          deferredNature = OFFENSIVE_NATURE[stat];
+          consumed[i] = consumed[i + 1] = true;
+          continue;
+        }
+      }
       deferredMaxPlus = true;
       consumed[i] = true;
       continue;
@@ -236,30 +358,44 @@ export function parseInput(input: string): ParseResult {
       }
     }
 
-    // EV/IV patterns: "Max <Stat>", "<number> <Stat>", "0 <Stat>"
+    // EV/IV patterns: "Max <Stat>", "Min <Stat>", "<number> <Stat>"
+    // "Min <Stat>" → 0 EVs AND 0 IVs (competitive convention for minimizing a stat)
     if ((lower === 'max' || lower === 'min') && i + 1 < tokens.length && !consumed[i + 1]) {
       const stat = resolveStat(tokens[i + 1]);
       if (stat) {
         if (!result.evs) result.evs = {};
         result.evs[stat] = lower === 'max' ? 252 : 0;
+        if (lower === 'min') {
+          if (!result.ivs) result.ivs = {};
+          result.ivs[stat] = 0;
+          deferredMinStat = stat;
+        }
         consumed[i] = consumed[i + 1] = true;
         continue;
       }
     }
 
+    // "<number> <Stat>" → always EVs; IVs default to 31 unless explicitly specified
     if (/^\d+$/.test(tokens[i]) && i + 1 < tokens.length && !consumed[i + 1]) {
       const stat = resolveStat(tokens[i + 1]);
       if (stat) {
         const value = parseInt(tokens[i], 10);
-        // "0 Atk" or "0 SpA" → IVs (competitive convention)
-        if (value === 0) {
-          if (!result.ivs) result.ivs = {};
-          result.ivs[stat] = 0;
-        } else {
-          if (!result.evs) result.evs = {};
-          result.evs[stat] = Math.min(value, 252);
-        }
+        if (!result.evs) result.evs = {};
+        result.evs[stat] = Math.min(value, 252);
         consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+    }
+
+    // Concatenated EV: "4HP", "252SpA", "0Atk"
+    const evConcat = tokens[i].match(/^(\d+)([a-zA-Z]+)$/);
+    if (evConcat) {
+      const stat = resolveStat(evConcat[2]);
+      if (stat) {
+        const value = parseInt(evConcat[1], 10);
+        if (!result.evs) result.evs = {};
+        result.evs[stat] = Math.min(value, 252);
+        consumed[i] = true;
         continue;
       }
     }
@@ -301,6 +437,70 @@ export function parseInput(input: string): ParseResult {
       continue;
     }
 
+    // "boosted" keyword → sets boostedStat for Protosynthesis/Quark Drive
+    if (lower === 'boosted') {
+      result.abilityOn = true;
+      result.boostedStat = 'auto';
+      consumed[i] = true;
+      continue;
+    }
+
+    // Ruin phrases (3-word) — before 2-word checks
+    if (i + 2 < tokens.length && !consumed[i + 1] && !consumed[i + 2]) {
+      const threeWord = [tokens[i], tokens[i + 1], tokens[i + 2]].join(' ').toLowerCase();
+      const ruinKey = RUIN_PHRASES[threeWord];
+      if (ruinKey) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        (result.fieldConditions as any)[ruinKey] = true;
+        consumed[i] = consumed[i + 1] = consumed[i + 2] = true;
+        continue;
+      }
+    }
+
+    // Terrain (2-word)
+    if (i + 1 < tokens.length && !consumed[i + 1]) {
+      const twoWord = [tokens[i], tokens[i + 1]].join(' ').toLowerCase();
+      const terrainVal = TERRAIN_PHRASES[twoWord];
+      if (terrainVal) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        result.fieldConditions.terrain = terrainVal;
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+      // Side conditions (2-word)
+      const sideCondition = SIDE_CONDITION_PHRASES[twoWord];
+      if (sideCondition) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        if (!result.fieldConditions[sideCondition.field]) {
+          result.fieldConditions[sideCondition.field] = {} as any;
+        }
+        (result.fieldConditions[sideCondition.field] as any)[sideCondition.key] = true;
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+    }
+
+    // Weather (1-word)
+    const weatherVal = WEATHER_KEYWORDS[lower];
+    if (weatherVal) {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      result.fieldConditions.weather = weatherVal;
+      consumed[i] = true;
+      continue;
+    }
+
+    // Single-word side conditions (reflect, tailwind)
+    const singleSide = SINGLE_SIDE_CONDITIONS[lower];
+    if (singleSide) {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      if (!result.fieldConditions[singleSide.field]) {
+        result.fieldConditions[singleSide.field] = {} as any;
+      }
+      (result.fieldConditions[singleSide.field] as any)[singleSide.key] = true;
+      consumed[i] = true;
+      continue;
+    }
+
     // Status keywords
     const statusMatch = STATUS_ALIASES[lower];
     if (statusMatch) {
@@ -317,6 +517,8 @@ export function parseInput(input: string): ParseResult {
   }
 
   // --- Pass 2: Entity matching ---
+  // Try all entity types at each position and pick the longest match to avoid
+  // single-word abilities/items stealing tokens from multi-word moves/species.
 
   for (let i = 0; i < tokens.length; i++) {
     if (consumed[i]) continue;
@@ -337,46 +539,41 @@ export function parseInput(input: string): ParseResult {
       continue;
     }
 
-    // Ability (greedy multi-word)
+    // Try all greedy multi-word entity types and pick the longest match
+    const candidates: { type: 'ability' | 'item' | 'move' | 'species'; name: string; count: number }[] = [];
     if (!result.ability) {
-      const abilityMatch = tryGreedyMatch(tokens, i, consumed, abilityById);
-      if (abilityMatch) {
-        result.ability = abilityMatch.name;
-        for (let j = i; j < i + abilityMatch.count; j++) consumed[j] = true;
-        continue;
-      }
+      const m = tryGreedyMatch(tokens, i, consumed, abilityById);
+      if (m) candidates.push({ type: 'ability', ...m });
     }
-
-    // Item (greedy multi-word, full name)
     if (!result.item) {
-      const itemMatch = tryGreedyMatch(tokens, i, consumed, itemById);
-      if (itemMatch) {
-        result.item = itemMatch.name;
-        for (let j = i; j < i + itemMatch.count; j++) consumed[j] = true;
-        continue;
-      }
+      const m = tryGreedyMatch(tokens, i, consumed, itemById);
+      if (m) candidates.push({ type: 'item', ...m });
     }
-
-    // Move (greedy multi-word)
     if (!result.move) {
-      const moveMatch = tryGreedyMatch(tokens, i, consumed, moveById);
-      if (moveMatch) {
-        result.move = moveMatch.name;
-        for (let j = i; j < i + moveMatch.count; j++) consumed[j] = true;
-        continue;
-      }
+      const m = tryGreedyMatch(tokens, i, consumed, moveById);
+      if (m) candidates.push({ type: 'move', ...m });
+    }
+    if (!result.species) {
+      const m = tryGreedyMatch(tokens, i, consumed, speciesById);
+      if (m) candidates.push({ type: 'species', ...m });
     }
 
-    // Species (greedy multi-word, then alias, then prefix)
-    if (!result.species) {
-      const speciesMatch = tryGreedyMatch(tokens, i, consumed, speciesById);
-      if (speciesMatch) {
-        result.species = speciesMatch.name;
-        for (let j = i; j < i + speciesMatch.count; j++) consumed[j] = true;
-        continue;
+    if (candidates.length > 0) {
+      // Prefer the longest match (most tokens consumed)
+      candidates.sort((a, b) => b.count - a.count);
+      const best = candidates[0];
+      switch (best.type) {
+        case 'ability': result.ability = best.name; break;
+        case 'item': result.item = best.name; break;
+        case 'move': result.move = best.name; break;
+        case 'species': result.species = best.name; break;
       }
+      for (let j = i; j < i + best.count; j++) consumed[j] = true;
+      continue;
+    }
 
-      // Species alias
+    // Species alias
+    if (!result.species) {
       const aliasMatch = SPECIES_ALIASES[tokens[i].toLowerCase()];
       if (aliasMatch) {
         result.species = aliasMatch;
@@ -401,24 +598,39 @@ export function parseInput(input: string): ParseResult {
 
   // --- Post-processing ---
 
-  // Resolve deferred patterns that depend on the move's offensive stat
-  if (result.move && (deferredMaxPlus || deferredBoost !== null)) {
-    const offStat = getOffensiveStat(result.move);
-    if (offStat) {
-      // "252+" — max EVs + boosting nature
+  // Resolve deferred patterns that depend on the relevant stat
+  if (deferredMaxPlus || deferredBoost !== null) {
+    let targetStat: StatKey | undefined;
+    if (context?.role === 'defender' && context.opposingMove) {
+      // Defender: resolve to the defensive stat that tanks the incoming move
+      targetStat = getDefensiveStat(context.opposingMove);
+    } else if (result.move) {
+      // Attacker: resolve to the move's offensive stat
+      targetStat = getOffensiveStat(result.move);
+    }
+    if (targetStat) {
       if (deferredMaxPlus) {
         if (!result.evs) result.evs = {};
-        result.evs[offStat] = 252;
+        result.evs[targetStat] = 252;
         if (!result.nature) {
-          result.nature = OFFENSIVE_NATURE[offStat];
+          result.nature = OFFENSIVE_NATURE[targetStat];
         }
       }
-      // Standalone "+2" etc. — boost the offensive stat
       if (deferredBoost !== null) {
         if (!result.boosts) result.boosts = {};
-        result.boosts[offStat] = Math.max(-6, Math.min(6, deferredBoost));
+        result.boosts[targetStat] = Math.max(-6, Math.min(6, deferredBoost));
       }
     }
+  }
+
+  // Apply deferred nature from "252+ <Stat>" if no explicit nature was found
+  if (!result.nature && deferredNature) {
+    result.nature = deferredNature;
+  }
+
+  // "Min <Stat>" → pick a nature that lowers that stat (using EVs to decide what to boost)
+  if (!result.nature && deferredMinStat) {
+    result.nature = findNatureForMinStat(deferredMinStat, result.evs);
   }
 
   // Infer nature from EV spread if not explicitly set
@@ -431,5 +643,75 @@ export function parseInput(input: string): ParseResult {
     result.abilityOn = true;
   }
 
+  // Protosynthesis/Quark Drive: set boostedStat and derive weather/terrain
+  if (result.ability === 'Protosynthesis' || result.ability === 'Quark Drive') {
+    if (!result.boostedStat) {
+      result.boostedStat = 'auto';
+    }
+    // Only derive weather/terrain if not holding Booster Energy
+    // (Booster Energy activates Proto/QD on its own without field conditions)
+    if (result.item !== 'Booster Energy') {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      if (result.ability === 'Protosynthesis' && !result.fieldConditions.weather) {
+        result.fieldConditions.weather = 'Sun';
+      }
+      if (result.ability === 'Quark Drive' && !result.fieldConditions.terrain) {
+        result.fieldConditions.terrain = 'Electric';
+      }
+    }
+  }
+
+  // Ability → field condition derivation
+  if (result.ability) {
+    const deriveField = ABILITY_FIELD_MAP[result.ability];
+    if (deriveField) {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      deriveField(result.fieldConditions);
+    }
+  }
+
   return result;
+}
+
+/** Merge two FieldConditions, with `b` taking precedence for weather/terrain. */
+function mergeFieldConditions(a: FieldConditions, b: FieldConditions): FieldConditions {
+  return {
+    weather: b.weather ?? a.weather,
+    terrain: b.terrain ?? a.terrain,
+    isBeadsOfRuin: a.isBeadsOfRuin || b.isBeadsOfRuin || undefined,
+    isSwordOfRuin: a.isSwordOfRuin || b.isSwordOfRuin || undefined,
+    isTabletsOfRuin: a.isTabletsOfRuin || b.isTabletsOfRuin || undefined,
+    isVesselOfRuin: a.isVesselOfRuin || b.isVesselOfRuin || undefined,
+    attackerSide: a.attackerSide || b.attackerSide
+      ? { ...a.attackerSide, ...b.attackerSide }
+      : undefined,
+    defenderSide: a.defenderSide || b.defenderSide
+      ? { ...a.defenderSide, ...b.defenderSide }
+      : undefined,
+  };
+}
+
+export interface VsResult {
+  attacker: ParseResult;
+  defender: ParseResult;
+  fieldConditions: FieldConditions;
+}
+
+export function parseVsInput(input: string): VsResult {
+  const parts = input.split(/\s+vs\s+/i);
+  const attackerInput = parts[0] ?? '';
+  const defenderInput = parts[1] ?? '';
+
+  const attacker = parseInput(attackerInput, { role: 'attacker' });
+  const defender = parseInput(defenderInput, {
+    role: 'defender',
+    opposingMove: attacker.move,
+  });
+
+  const fieldConditions = mergeFieldConditions(
+    attacker.fieldConditions ?? {},
+    defender.fieldConditions ?? {},
+  );
+
+  return { attacker, defender, fieldConditions };
 }

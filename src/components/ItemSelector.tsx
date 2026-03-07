@@ -1,4 +1,5 @@
 import { itemsList } from '../data/gen';
+import { Typeahead } from './Typeahead';
 
 interface Props {
   value: string;
@@ -7,20 +8,15 @@ interface Props {
 
 export function ItemSelector({ value, onChange }: Props) {
   return (
-    <div className="selector">
-      <label htmlFor="item-select">Item</label>
-      <select
-        id="item-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">(none)</option>
-        {itemsList.map((name) => (
-          <option key={name} value={name}>
-            {name}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Typeahead
+      id="item-select"
+      label="Item"
+      value={value}
+      onChange={onChange}
+      options={itemsList}
+      placeholder="Search items..."
+      allowEmpty
+      emptyLabel="(none)"
+    />
   );
 }

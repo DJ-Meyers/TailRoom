@@ -1,22 +1,24 @@
 import { useState, useCallback } from 'react';
 import { parseInput } from '../parser';
 import type { ParseResult } from '../types';
+import type { ParseContext } from '../parser';
 
 interface Props {
   onParsed: (result: ParseResult) => void;
   label: string;
+  parseContext?: ParseContext;
 }
 
-export function ParseInput({ onParsed, label }: Props) {
+export function ParseInput({ onParsed, label, parseContext }: Props) {
   const [text, setText] = useState('');
   const [unmatched, setUnmatched] = useState<string[]>([]);
 
   const handleSubmit = useCallback(() => {
     if (!text.trim()) return;
-    const result = parseInput(text);
+    const result = parseInput(text, parseContext);
     setUnmatched(result.unmatched);
     onParsed(result);
-  }, [text, onParsed]);
+  }, [text, onParsed, parseContext]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

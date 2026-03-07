@@ -1,4 +1,5 @@
 import { speciesList } from '../data/gen';
+import { Typeahead } from './Typeahead';
 
 interface Props {
   value: string;
@@ -8,20 +9,13 @@ interface Props {
 
 export function PokemonSelector({ value, onChange, id }: Props) {
   return (
-    <div className="selector">
-      <label htmlFor={id}>Pokemon</label>
-      <input
-        id={id}
-        list={`${id}-list`}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Search Pokemon..."
-      />
-      <datalist id={`${id}-list`}>
-        {speciesList.map((name) => (
-          <option key={name} value={name} />
-        ))}
-      </datalist>
-    </div>
+    <Typeahead
+      id={id}
+      label="Pokemon"
+      value={value}
+      onChange={onChange}
+      options={speciesList}
+      placeholder="Search Pokemon..."
+    />
   );
 }

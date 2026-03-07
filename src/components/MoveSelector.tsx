@@ -1,4 +1,5 @@
 import { movesList } from '../data/gen';
+import { Typeahead } from './Typeahead';
 
 interface Props {
   value: string;
@@ -7,20 +8,13 @@ interface Props {
 
 export function MoveSelector({ value, onChange }: Props) {
   return (
-    <div className="selector">
-      <label htmlFor="move-select">Move</label>
-      <input
-        id="move-select"
-        list="move-list"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Search moves..."
-      />
-      <datalist id="move-list">
-        {movesList.map((name) => (
-          <option key={name} value={name} />
-        ))}
-      </datalist>
-    </div>
+    <Typeahead
+      id="move-select"
+      label="Move"
+      value={value}
+      onChange={onChange}
+      options={movesList}
+      placeholder="Search moves..."
+    />
   );
 }

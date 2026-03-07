@@ -27,6 +27,45 @@ body {
   font-size: 1.8rem;
 }
 
+/* Vs-input */
+.vs-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vs-input input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.vs-input input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.vs-input button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #3498db;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vs-input button:hover {
+  background: #2980b9;
+}
+
 .layout {
   display: flex;
   gap: 1.5rem;
@@ -108,6 +147,48 @@ body {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Typeahead */
+.typeahead {
+  position: relative;
+}
+
+.typeahead-list {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.typeahead-item {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.typeahead-item.highlighted {
+  background: #e8f0fe;
+}
+
+.typeahead-item.selected {
+  font-weight: 600;
+}
+
+.typeahead-empty {
+  color: #888;
+  font-style: italic;
+  cursor: default;
 }
 
 /* Parse input */

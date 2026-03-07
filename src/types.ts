@@ -23,6 +23,27 @@ export interface PokemonState {
   status: string;
   isCrit: boolean;
   abilityOn: boolean;
+  boostedStat: string;
+}
+
+export interface FieldConditions {
+  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow' | 'Hail';
+  terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
+  isBeadsOfRuin?: boolean;
+  isSwordOfRuin?: boolean;
+  isTabletsOfRuin?: boolean;
+  isVesselOfRuin?: boolean;
+  attackerSide?: {
+    isHelpingHand?: boolean;
+    isTailwind?: boolean;
+  };
+  defenderSide?: {
+    isReflect?: boolean;
+    isLightScreen?: boolean;
+    isAuroraVeil?: boolean;
+    isFriendGuard?: boolean;
+    isTailwind?: boolean;
+  };
 }
 
 export interface ParseResult {
@@ -39,6 +60,8 @@ export interface ParseResult {
   status?: string;
   isCrit?: boolean;
   abilityOn?: boolean;
+  boostedStat?: string;
+  fieldConditions?: FieldConditions;
   unmatched: string[];
 }
 
