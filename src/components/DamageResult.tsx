@@ -7,7 +7,7 @@ interface Props {
   } | null;
 }
 
-export function DamageResult({ result }: Props) {
+export const DamageResult = ({ result }: Props) => {
   if (!result) {
     return (
       <div className="damage-result">
@@ -31,4 +31,4 @@ export function DamageResult({ result }: Props) {
       {koChance && <p className="ko-chance">{koChance}</p>}
     </div>
   );
-}
+};

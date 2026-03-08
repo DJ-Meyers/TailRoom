@@ -8,7 +8,7 @@ import { usePokemon } from '~/hooks/usePokemon';
 import type { FieldConditions } from '~/types';
 import { parseVsInput } from '~/utils/parser';
 
-function App() {
+const App = () => {
   const attacker = usePokemon('Garchomp', 'Earthquake');
   const defender = usePokemon('Corviknight', '');
   const [vsInput, setVsInput] = useState('');
@@ -160,6 +160,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;

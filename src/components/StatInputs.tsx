@@ -12,7 +12,7 @@ interface Props {
 
 const BOOSTABLE_STATS: StatKey[] = ['atk', 'def', 'spa', 'spd', 'spe'];
 
-export function StatInputs({ evs, ivs, boosts, onEvChange, onIvChange, onBoostChange }: Props) {
+export const StatInputs = ({ evs, ivs, boosts, onEvChange, onIvChange, onBoostChange }: Props) => {
   const totalEvs = STAT_KEYS.reduce((sum, key) => sum + evs[key], 0);
   const remaining = MAX_TOTAL_EVS - totalEvs;
 
@@ -75,4 +75,4 @@ export function StatInputs({ evs, ivs, boosts, onEvChange, onIvChange, onBoostCh
       })}
     </div>
   );
-}
+};

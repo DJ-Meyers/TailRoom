@@ -7,15 +7,11 @@ interface Props {
   id: string;
 }
 
-export function PokemonSelector({ value, onChange, id }: Props) {
-  return (
-    <Typeahead
+export const PokemonSelector = ({ value, onChange, id }: Props) => <Typeahead
       id={id}
       label="Pokemon"
       value={value}
       onChange={onChange}
       options={speciesList}
       placeholder="Search Pokemon..."
-    />
-  );
-}
+    />;

@@ -12,7 +12,7 @@ interface Props {
   getLabel?: (value: string) => string;
 }
 
-export function Typeahead({
+export const Typeahead = ({
   id,
   label,
   value,
@@ -22,7 +22,7 @@ export function Typeahead({
   allowEmpty = false,
   emptyLabel = '(none)',
   getLabel,
-}: Props) {
+}: Props) => {
   const displayValue = (v: string) => (getLabel ? getLabel(v) : v);
   const [query, setQuery] = useState(displayValue(value));
   const [open, setOpen] = useState(false);
@@ -149,4 +149,4 @@ export function Typeahead({
       )}
     </div>
   );
-}
+};

@@ -10,7 +10,7 @@ interface Props {
   parseContext?: ParseContext;
 }
 
-export function ParseInput({ onParsed, label, parseContext }: Props) {
+export const ParseInput = ({ onParsed, label, parseContext }: Props) => {
   const [text, setText] = useState('');
   const [unmatched, setUnmatched] = useState<string[]>([]);
 
@@ -49,4 +49,4 @@ export function ParseInput({ onParsed, label, parseContext }: Props) {
       )}
     </div>
   );
-}
+};

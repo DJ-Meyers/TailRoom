@@ -42,7 +42,7 @@ for (const t of gen.types) typeById.set(toID(t.name), t.name);
 // --- Helpers ---
 
 /** Given a move name, return the stat it uses for offense. */
-function getOffensiveStat(moveName: string): StatKey | undefined {
+const getOffensiveStat = (moveName: string): StatKey | undefined => {
   const move = gen.moves.get(toID(moveName));
   if (!move) return undefined;
   // Body Press etc. override the offensive stat
@@ -51,10 +51,10 @@ function getOffensiveStat(moveName: string): StatKey | undefined {
   if (move.category === 'Physical') return 'atk';
   if (move.category === 'Special') return 'spa';
   return undefined;
-}
+};
 
 /** Given a move name, return the stat the defender needs to tank it. */
-function getDefensiveStat(moveName: string): StatKey | undefined {
+const getDefensiveStat = (moveName: string): StatKey | undefined => {
   const move = gen.moves.get(toID(moveName));
   if (!move) return undefined;
   const override = (move as any).overrideDefensiveStat;
@@ -62,7 +62,7 @@ function getDefensiveStat(moveName: string): StatKey | undefined {
   if (move.category === 'Physical') return 'def';
   if (move.category === 'Special') return 'spd';
   return undefined;
-}
+};
 
 export interface ParseContext {
   role?: 'attacker' | 'defender';
@@ -71,10 +71,7 @@ export interface ParseContext {
 }
 
 /** Given a stat to lower and an EV spread, pick the best nature. */
-function findNatureForMinStat(
-  lowerStat: StatKey,
-  evs?: Partial<Record<StatKey, number>>,
-): string | undefined {
+const findNatureForMinStat = (lowerStat: StatKey, evs?: Partial<Record<StatKey, number>>): string | undefined => {
   if (lowerStat === 'hp') return undefined; // natures don't affect HP
 
   // Find the best stat to boost from EVs (highest EV, excluding HP and the lowered stat)
@@ -92,19 +89,11 @@ function findNatureForMinStat(
   if (!boostStat) return undefined;
 
   return NATURE_TABLE[`${boostStat},${lowerStat}`];
-}
+};
 
-function resolveStat(token: string): StatKey | undefined {
-  return STAT_ALIASES[toID(token)];
-}
+const resolveStat = (token: string): StatKey | undefined => STAT_ALIASES[toID(token)];
 
-function tryGreedyMatch(
-  tokens: string[],
-  startIdx: number,
-  consumed: boolean[],
-  lookupMap: Map<string, string>,
-  maxWords = 4,
-): { name: string; count: number } | null {
+const tryGreedyMatch = (tokens: string[], startIdx: number, consumed: boolean[], lookupMap: Map<string, string>, maxWords = 4): { name: string; count: number } | null => {
   for (let len = Math.min(maxWords, tokens.length - startIdx); len >= 1; len--) {
     let allFree = true;
     for (let j = startIdx; j < startIdx + len; j++) {
@@ -117,16 +106,16 @@ function tryGreedyMatch(
     if (match) return { name: match, count: len };
   }
   return null;
-}
+};
 
-function isEntityStart(tokens: string[], i: number, consumed: boolean[]): boolean {
+const isEntityStart = (tokens: string[], i: number, consumed: boolean[]): boolean => {
   if (i + 1 >= tokens.length || consumed[i + 1]) return false;
   const twoWordId = toID(tokens[i] + tokens[i + 1]);
   return abilityById.has(twoWordId) || moveById.has(twoWordId) ||
          speciesById.has(twoWordId) || itemById.has(twoWordId);
-}
+};
 
-function prefixMatchSpecies(token: string): string | undefined {
+const prefixMatchSpecies = (token: string): string | undefined => {
   const id = toID(token);
   if (id.length < 3) return undefined; // too short for prefix match
   const matches: string[] = [];
@@ -140,9 +129,9 @@ function prefixMatchSpecies(token: string): string | undefined {
     return matches[0];
   }
   return undefined;
-}
+};
 
-function inferNature(evs: Partial<Record<StatKey, number>>): string | undefined {
+const inferNature = (evs: Partial<Record<StatKey, number>>): string | undefined => {
   const maxedStats = Object.entries(evs).filter(([, v]) => v === 252);
   if (maxedStats.length === 0) return undefined;
 
@@ -163,11 +152,11 @@ function inferNature(evs: Partial<Record<StatKey, number>>): string | undefined 
   if (hasMaxDef) return 'Bold';      // +Def -Atk
   if (hasMaxSpD) return 'Calm';      // +SpD -Atk
   return undefined;
-}
+};
 
 // --- Main parser ---
 
-export function parseInput(input: string, context?: ParseContext): ParseResult {
+export const parseInput = (input: string, context?: ParseContext): ParseResult => {
   const tokens = input.trim().split(/\s+/).filter(Boolean);
   const consumed = new Array<boolean>(tokens.length).fill(false);
   const result: ParseResult = { unmatched: [] };
@@ -543,11 +532,10 @@ export function parseInput(input: string, context?: ParseContext): ParseResult {
   }
 
   return result;
-}
+};
 
 /** Merge two FieldConditions, with `b` taking precedence for weather/terrain. */
-function mergeFieldConditions(a: FieldConditions, b: FieldConditions): FieldConditions {
-  return {
+const mergeFieldConditions = (a: FieldConditions, b: FieldConditions): FieldConditions => ({
     weather: b.weather ?? a.weather,
     terrain: b.terrain ?? a.terrain,
     isBeadsOfRuin: a.isBeadsOfRuin || b.isBeadsOfRuin || undefined,
@@ -560,8 +548,7 @@ function mergeFieldConditions(a: FieldConditions, b: FieldConditions): FieldCond
     defenderSide: a.defenderSide || b.defenderSide
       ? { ...a.defenderSide, ...b.defenderSide }
       : undefined,
-  };
-}
+  });
 
 export interface VsResult {
   attacker: ParseResult;
@@ -569,7 +556,7 @@ export interface VsResult {
   fieldConditions: FieldConditions;
 }
 
-export function parseVsInput(input: string): VsResult {
+export const parseVsInput = (input: string): VsResult => {
   const parts = input.split(/\s+vs\s+/i);
   const attackerInput = parts[0] ?? '';
   const defenderInput = parts[1] ?? '';
@@ -586,4 +573,4 @@ export function parseVsInput(input: string): VsResult {
   );
 
   return { attacker, defender, fieldConditions };
-}
+};

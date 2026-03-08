@@ -20,9 +20,7 @@ const natureLabelMap = new Map(
   }),
 );
 
-export function NatureSelector({ value, onChange }: Props) {
-  return (
-    <Typeahead
+export const NatureSelector = ({ value, onChange }: Props) => <Typeahead
       id="nature-select"
       label="Nature"
       value={value}
@@ -30,6 +28,4 @@ export function NatureSelector({ value, onChange }: Props) {
       options={natureNames}
       placeholder="Search natures..."
       getLabel={(v) => natureLabelMap.get(v) ?? v}
-    />
-  );
-}
+    />;

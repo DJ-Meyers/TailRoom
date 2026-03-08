@@ -6,15 +6,11 @@ interface Props {
   abilities: string[];
 }
 
-export function AbilitySelector({ value, onChange, abilities }: Props) {
-  return (
-    <Typeahead
+export const AbilitySelector = ({ value, onChange, abilities }: Props) => <Typeahead
       id="ability-select"
       label="Ability"
       value={value}
       onChange={onChange}
       options={abilities}
       placeholder="Search abilities..."
-    />
-  );
-}
+    />;

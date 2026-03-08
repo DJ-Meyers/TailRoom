@@ -6,15 +6,11 @@ interface Props {
   onChange: (move: string) => void;
 }
 
-export function MoveSelector({ value, onChange }: Props) {
-  return (
-    <Typeahead
+export const MoveSelector = ({ value, onChange }: Props) => <Typeahead
       id="move-select"
       label="Move"
       value={value}
       onChange={onChange}
       options={movesList}
       placeholder="Search moves..."
-    />
-  );
-}
+    />;

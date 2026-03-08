@@ -46,7 +46,7 @@ interface Props {
   parseContext?: ParseContext;
 }
 
-export function PokemonPanel({
+export const PokemonPanel = ({
   label,
   state,
   abilities,
@@ -64,9 +64,7 @@ export function PokemonPanel({
   onIsCritChange,
   onParsed,
   parseContext,
-}: Props) {
-  return (
-    <div className="pokemon-panel">
+}: Props) => <div className="pokemon-panel">
       <h2>{label}</h2>
       <ParseInput onParsed={onParsed} label={label.toLowerCase()} parseContext={parseContext} />
       <PokemonSelector
@@ -129,6 +127,4 @@ export function PokemonPanel({
         onIvChange={onIvChange}
         onBoostChange={onBoostChange}
       />
-    </div>
-  );
-}
+    </div>;

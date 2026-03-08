@@ -8,7 +8,7 @@ const defaultEvs = (): StatsTable => ({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, s
 const defaultIvs = (): StatsTable => ({ hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 });
 const defaultBoosts = (): StatsTable => ({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
 
-export function usePokemon(initialSpecies: string, initialMove: string) {
+export const usePokemon = (initialSpecies: string, initialMove: string) => {
   const [state, setState] = useState<PokemonState>(() => {
     const abilities = getSpeciesAbilities(initialSpecies);
     return {
@@ -162,4 +162,4 @@ export function usePokemon(initialSpecies: string, initialMove: string) {
     applyParsed,
     abilities: getSpeciesAbilities(state.species),
   };
-}
+};

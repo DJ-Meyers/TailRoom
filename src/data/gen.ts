@@ -32,7 +32,7 @@ for (const i of gen.items) {
 }
 itemsList.sort();
 
-export function getSpeciesAbilities(species: string): string[] {
+export const getSpeciesAbilities = (species: string): string[] => {
   const s = gen.species.get(toID(species));
   if (!s) return [];
   const abilities: string[] = [];
@@ -41,4 +41,4 @@ export function getSpeciesAbilities(species: string): string[] {
     if (ab[key]) abilities.push(ab[key]!);
   }
   return abilities;
-}
+};

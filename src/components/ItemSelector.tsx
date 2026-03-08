@@ -6,9 +6,7 @@ interface Props {
   onChange: (item: string) => void;
 }
 
-export function ItemSelector({ value, onChange }: Props) {
-  return (
-    <Typeahead
+export const ItemSelector = ({ value, onChange }: Props) => <Typeahead
       id="item-select"
       label="Item"
       value={value}
@@ -17,6 +15,4 @@ export function ItemSelector({ value, onChange }: Props) {
       placeholder="Search items..."
       allowEmpty
       emptyLabel="(none)"
-    />
-  );
-}
+    />;
