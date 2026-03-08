@@ -1,0 +1,31 @@
+import { Typeahead } from '~/components/Typeahead';
+import { naturesList } from '~/data/gen';
+import type { StatKey } from '~/types';
+import { STAT_LABELS } from '~/types';
+
+interface Props {
+  value: string;
+  onChange: (nature: string) => void;
+}
+
+const natureNames = naturesList.map((n) => n.name);
+
+const natureLabelMap = new Map(
+  naturesList.map((n) => {
+    const label =
+      n.plus && n.minus
+        ? `${n.name} (+${STAT_LABELS[n.plus as StatKey]}, -${STAT_LABELS[n.minus as StatKey]})`
+        : n.name;
+    return [n.name, label];
+  }),
+);
+
+export const NatureSelector = ({ value, onChange }: Props) => <Typeahead
+      id="nature-select"
+      label="Nature"
+      value={value}
+      onChange={onChange}
+      options={natureNames}
+      placeholder="Search natures..."
+      getLabel={(v) => natureLabelMap.get(v) ?? v}
+    />;
