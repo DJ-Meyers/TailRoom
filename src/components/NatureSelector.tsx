@@ -1,7 +1,7 @@
-import { naturesList } from '../data/gen';
-import type { StatKey } from '../types';
-import { STAT_LABELS } from '../types';
-import { Typeahead } from './Typeahead';
+import { Typeahead } from '~/components/Typeahead';
+import { naturesList } from '~/data/gen';
+import type { StatKey } from '~/types';
+import { STAT_LABELS } from '~/types';
 
 interface Props {
   value: string;

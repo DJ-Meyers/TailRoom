@@ -1,14 +1,14 @@
-import type { StatKey, ParseResult } from '../types';
-import type { ParseContext } from '../parser';
-import { PokemonSelector } from './PokemonSelector';
-import { NatureSelector } from './NatureSelector';
-import { AbilitySelector } from './AbilitySelector';
-import { ItemSelector } from './ItemSelector';
-import { MoveSelector } from './MoveSelector';
-import { StatInputs } from './StatInputs';
-import { ParseInput } from './ParseInput';
-import { Typeahead } from './Typeahead';
-import type { PokemonState } from '../types';
+import { AbilitySelector } from '~/components/AbilitySelector';
+import { ItemSelector } from '~/components/ItemSelector';
+import { MoveSelector } from '~/components/MoveSelector';
+import { NatureSelector } from '~/components/NatureSelector';
+import { ParseInput } from '~/components/ParseInput';
+import { PokemonSelector } from '~/components/PokemonSelector';
+import { StatInputs } from '~/components/StatInputs';
+import { Typeahead } from '~/components/Typeahead';
+import type { ParseResult,StatKey } from '~/types';
+import type { PokemonState } from '~/types';
+import type { ParseContext } from '~/utils/parser';
 
 const TYPE_NAMES = [
   'Normal', 'Fighting', 'Flying', 'Poison', 'Ground', 'Rock',

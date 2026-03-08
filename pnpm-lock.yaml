@@ -36,12 +36,18 @@ importers:
       eslint:
         specifier: ^9.39.1
         version: 9.39.3
+      eslint-plugin-no-relative-import-paths:
+        specifier: ^1.6.1
+        version: 1.6.1
       eslint-plugin-react-hooks:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.3)
       eslint-plugin-react-refresh:
         specifier: ^0.4.24
         version: 0.4.26(eslint@9.39.3)
+      eslint-plugin-simple-import-sort:
+        specifier: ^12.1.1
+        version: 12.1.1(eslint@9.39.3)
       globals:
         specifier: ^16.5.0
         version: 16.5.0
@@ -762,6 +768,9 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
+  eslint-plugin-no-relative-import-paths@1.6.1:
+    resolution: {integrity: sha512-YZNeOnsOrJcwhFw0X29MXjIzu2P/f5X2BZDPWw1R3VUYBRFxNIh77lyoL/XrMU9ewZNQPcEvAgL/cBOT1P330A==}
+
   eslint-plugin-react-hooks@7.0.1:
     resolution: {integrity: sha512-O0d0m04evaNzEPoSW+59Mezf8Qt0InfgGIBJnpC0h3NH/WjUAR7BIKUfysC6todmtiZ/A0oUVS8Gce0WhBrHsA==}
     engines: {node: '>=18'}
@@ -772,6 +781,11 @@ packages:
     resolution: {integrity: sha512-1RETEylht2O6FM/MvgnyvT+8K21wLqDNg4qD51Zj3guhjt433XbnnkVttHMyaVyAFD03QSV4LPS5iE3VQmO7XQ==}
     peerDependencies:
       eslint: '>=8.40'
+
+  eslint-plugin-simple-import-sort@12.1.1:
+    resolution: {integrity: sha512-6nuzu4xwQtE3332Uz0to+TxDQYRLTKRESSc2hefVT48Zc8JthmN23Gx9lnYhu0FtkRSL1oxny3kJ2aveVhmOVA==}
+    peerDependencies:
+      eslint: '>=5.0.0'
 
   eslint-scope@8.4.0:
     resolution: {integrity: sha512-sNXOfKCn74rt8RICKMvJS7XKV/Xk9kA7DyJr8mJik3S7Cwgy3qlkkmyS2uQB3jiJg6VNdZd/pDBJu0nvG2NlTg==}
@@ -1909,6 +1923,8 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
+  eslint-plugin-no-relative-import-paths@1.6.1: {}
+
   eslint-plugin-react-hooks@7.0.1(eslint@9.39.3):
     dependencies:
       '@babel/core': 7.29.0
@@ -1921,6 +1937,10 @@ snapshots:
       - supports-color
 
   eslint-plugin-react-refresh@0.4.26(eslint@9.39.3):
+    dependencies:
+      eslint: 9.39.3
+
+  eslint-plugin-simple-import-sort@12.1.1(eslint@9.39.3):
     dependencies:
       eslint: 9.39.3
 

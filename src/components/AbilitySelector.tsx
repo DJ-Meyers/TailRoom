@@ -1,4 +1,4 @@
-import { Typeahead } from './Typeahead';
+import { Typeahead } from '~/components/Typeahead';
 
 interface Props {
   value: string;

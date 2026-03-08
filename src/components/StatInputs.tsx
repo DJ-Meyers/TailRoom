@@ -1,5 +1,5 @@
-import type { StatsTable, StatKey } from '../types';
-import { STAT_KEYS, STAT_LABELS, MAX_EV_PER_STAT, EV_STEP, MAX_TOTAL_EVS } from '../types';
+import type { StatKey,StatsTable } from '~/types';
+import { EV_STEP, MAX_EV_PER_STAT, MAX_TOTAL_EVS,STAT_KEYS, STAT_LABELS } from '~/types';
 
 interface Props {
   evs: StatsTable;

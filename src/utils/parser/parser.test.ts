@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { parseInput, parseVsInput } from './parser';
+import { describe, expect,it } from 'vitest';
+
+import { parseInput, parseVsInput } from '~/utils/parser/parser';
 
 describe('parseInput', () => {
   // --- VGC full-string examples (the user's reported cases) ---
@@ -483,6 +484,26 @@ describe('parseInput', () => {
         const r = parseInput('hail Garchomp');
         expect(r.fieldConditions?.weather).toBe('Hail');
       });
+
+      it('"in rain" sets weather to Rain', () => {
+        const r = parseInput('Garchomp Earthquake in rain');
+        expect(r.fieldConditions?.weather).toBe('Rain');
+      });
+
+      it('"in the snow" sets weather to Snow', () => {
+        const r = parseInput('Garchomp in the snow');
+        expect(r.fieldConditions?.weather).toBe('Snow');
+      });
+
+      it('"(in rain)" sets weather to Rain', () => {
+        const r = parseInput('Garchomp Earthquake (in rain)');
+        expect(r.fieldConditions?.weather).toBe('Rain');
+      });
+
+      it('"in sun" sets weather to Sun', () => {
+        const r = parseInput('Flutter Mane Dazzling Gleam in sun');
+        expect(r.fieldConditions?.weather).toBe('Sun');
+      });
     });
 
     describe('terrain keywords', () => {
@@ -687,5 +708,63 @@ describe('parseVsInput', () => {
     expect(r.attacker.species).toBe('Garchomp');
     expect(r.attacker.move).toBe('Earthquake');
     expect(r.defender.species).toBeUndefined();
+  });
+
+  describe('Sandstorm Sand Force Excadrill Sand Tomb vs 252 HP 168 Def Impish Sandile', () => {
+    const input = 'Sandstorm Sand Force Excadrill Sand Tomb vs 252 HP 168 Def Impish Sandile';
+
+    it('parses the full vs string with correct attacker fields', () => {
+      const r = parseVsInput(input);
+      expect(r.attacker.species).toBe('Excadrill');
+      expect(r.attacker.ability).toBe('Sand Force');
+      expect(r.attacker.move).toBe('Sand Tomb');
+      expect(r.attacker.unmatched).toEqual([]);
+    });
+
+    it('parses the full vs string with correct defender fields', () => {
+      const r = parseVsInput(input);
+      expect(r.defender.species).toBe('Sandile');
+      expect(r.defender.evs?.hp).toBe(252);
+      expect(r.defender.evs?.def).toBe(168);
+      expect(r.defender.nature).toBe('Impish');
+      expect(r.defender.unmatched).toEqual([]);
+    });
+
+    it('sets Sand weather from the explicit Sandstorm keyword', () => {
+      const r = parseVsInput(input);
+      expect(r.fieldConditions.weather).toBe('Sand');
+    });
+
+    it('does not confuse "Sandile" with the "sand" weather keyword', () => {
+      const r = parseInput('252 HP 168 Def Impish Sandile');
+      expect(r.species).toBe('Sandile');
+      expect(r.evs?.hp).toBe(252);
+      expect(r.evs?.def).toBe(168);
+      expect(r.nature).toBe('Impish');
+      expect(r.fieldConditions?.weather).toBeUndefined();
+      expect(r.unmatched).toEqual([]);
+    });
+
+    it('"Sandstorm" is consumed as weather, not as part of an entity', () => {
+      const r = parseInput('Sandstorm Excadrill Sand Tomb');
+      expect(r.fieldConditions?.weather).toBe('Sand');
+      expect(r.species).toBe('Excadrill');
+      expect(r.move).toBe('Sand Tomb');
+    });
+
+    it('Sand Force is recognized as an ability alongside Sandstorm weather', () => {
+      const r = parseInput('Sandstorm Sand Force Excadrill');
+      expect(r.ability).toBe('Sand Force');
+      expect(r.fieldConditions?.weather).toBe('Sand');
+      expect(r.species).toBe('Excadrill');
+      expect(r.unmatched).toEqual([]);
+    });
+
+    it('Sand Tomb is recognized as a move alongside Sandstorm weather', () => {
+      const r = parseInput('Sandstorm Excadrill Sand Tomb');
+      expect(r.move).toBe('Sand Tomb');
+      expect(r.fieldConditions?.weather).toBe('Sand');
+      expect(r.unmatched).toEqual([]);
+    });
   });
 });

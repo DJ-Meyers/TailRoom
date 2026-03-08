@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
-import { parseInput } from '../parser';
-import type { ParseResult } from '../types';
-import type { ParseContext } from '../parser';
+import { useCallback,useState } from 'react';
+
+import type { ParseResult } from '~/types';
+import type { ParseContext } from '~/utils/parser';
+import { parseInput } from '~/utils/parser';
 
 interface Props {
   onParsed: (result: ParseResult) => void;

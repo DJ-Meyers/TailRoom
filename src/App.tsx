@@ -1,11 +1,12 @@
+import { calculate, Field, Move, Pokemon, toID } from '@smogon/calc';
 import { useCallback, useMemo, useState } from 'react';
-import { Pokemon, Move, Field, calculate, toID } from '@smogon/calc';
-import { gen } from './data/gen';
-import { usePokemon } from './hooks/usePokemon';
-import { PokemonPanel } from './components/PokemonPanel';
-import { DamageResult } from './components/DamageResult';
-import { parseVsInput } from './parser';
-import type { FieldConditions } from './types';
+
+import { DamageResult } from '~/components/DamageResult';
+import { PokemonPanel } from '~/components/PokemonPanel';
+import { gen } from '~/data/gen';
+import { usePokemon } from '~/hooks/usePokemon';
+import type { FieldConditions } from '~/types';
+import { parseVsInput } from '~/utils/parser';
 
 function App() {
   const attacker = usePokemon('Garchomp', 'Earthquake');

@@ -1,5 +1,5 @@
-import { movesList } from '../data/gen';
-import { Typeahead } from './Typeahead';
+import { Typeahead } from '~/components/Typeahead';
+import { movesList } from '~/data/gen';
 
 interface Props {
   value: string;

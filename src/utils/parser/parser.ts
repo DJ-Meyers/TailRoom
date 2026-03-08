@@ -1,6 +1,23 @@
 import { toID } from '@smogon/calc';
-import { gen } from './data/gen';
-import type { FieldConditions, ParseResult, StatKey } from './types';
+
+import { gen } from '~/data/gen';
+import type { FieldConditions, ParseResult, StatKey } from '~/types';
+import {
+  ABILITY_FIELD_MAP,
+  ABILITY_ON_LIST,
+  DEFAULT_BOOST_FOR_LOWER,
+  ITEM_ALIASES,
+  NATURE_TABLE,
+  OFFENSIVE_NATURE,
+  RUIN_PHRASES,
+  SIDE_CONDITION_PHRASES,
+  SINGLE_SIDE_CONDITIONS,
+  SPECIES_ALIASES,
+  STAT_ALIASES,
+  STATUS_ALIASES,
+  TERRAIN_PHRASES,
+  WEATHER_KEYWORDS,
+} from '~/utils/parser/constants';
 
 // --- Lookup maps (built once from gen data) ---
 
@@ -21,150 +38,6 @@ for (const n of gen.natures) natureById.set(toID(n.name), n.name);
 
 const typeById = new Map<string, string>();
 for (const t of gen.types) typeById.set(toID(t.name), t.name);
-
-// --- Alias maps ---
-
-const STAT_ALIASES: Record<string, StatKey> = {
-  hp: 'hp',
-  atk: 'atk', attack: 'atk',
-  def: 'def', defense: 'def',
-  spa: 'spa', spatk: 'spa', specialattack: 'spa', spatt: 'spa',
-  spd: 'spd', spdef: 'spd', specialdefense: 'spd',
-  spe: 'spe', speed: 'spe', spc: 'spa',
-};
-
-const ITEM_ALIASES: Record<string, string> = {
-  specs: 'Choice Specs',
-  band: 'Choice Band',
-  scarf: 'Choice Scarf',
-  vest: 'Assault Vest',
-  av: 'Assault Vest',
-  boots: 'Heavy-Duty Boots',
-  hdb: 'Heavy-Duty Boots',
-  orb: 'Life Orb',
-  lo: 'Life Orb',
-  lefties: 'Leftovers',
-  sash: 'Focus Sash',
-  lum: 'Lum Berry',
-  sitrus: 'Sitrus Berry',
-  eviolite: 'Eviolite',
-  plate: 'Life Orb', // generic fallback; specific plates need full name
-};
-
-const STATUS_ALIASES: Record<string, string> = {
-  burned: 'brn', burn: 'brn', brn: 'brn',
-  paralyzed: 'par', para: 'par', par: 'par',
-  poisoned: 'psn', poison: 'psn', psn: 'psn',
-  toxic: 'tox', tox: 'tox',
-  frozen: 'frz', freeze: 'frz', frz: 'frz',
-  asleep: 'slp', sleep: 'slp', slp: 'slp',
-};
-
-const SPECIES_ALIASES: Record<string, string> = {
-  lando: 'Landorus-Therian',
-  landot: 'Landorus-Therian',
-  landoi: 'Landorus-Incarnate',
-  pex: 'Toxapex',
-  ferro: 'Ferrothorn',
-  corv: 'Corviknight',
-  clef: 'Clefable',
-  chomp: 'Garchomp',
-  flutter: 'Flutter Mane',
-  rilla: 'Rillaboom',
-  ghold: 'Gholdengo',
-  king: 'Kingambit',
-  gar: 'Gardevoir',
-  torn: 'Tornadus-Therian',
-  tornt: 'Tornadus-Therian',
-  thundy: 'Thundurus-Therian',
-  cress: 'Cresselia',
-  bliss: 'Blissey',
-  ttar: 'Tyranitar',
-  mence: 'Salamence',
-  pert: 'Swampert',
-  lele: 'Tapu Lele',
-  koko: 'Tapu Koko',
-  fini: 'Tapu Fini',
-  bulu: 'Tapu Bulu',
-  zard: 'Charizard',
-  pult: 'Dragapult',
-  weavile: 'Weavile',
-  skarm: 'Skarmory',
-  hippo: 'Hippowdon',
-  tusk: 'Great Tusk',
-  iron: 'Iron Valiant',
-  valiant: 'Iron Valiant',
-  hands: 'Iron Hands',
-  bundle: 'Iron Bundle',
-  moth: 'Iron Moth',
-  treads: 'Iron Treads',
-  roaring: 'Roaring Moon',
-  walking: 'Walking Wake',
-  gouging: 'Gouging Fire',
-  raging: 'Raging Bolt',
-  oger: 'Ogerpon',
-  ursaluna: 'Ursaluna-Bloodmoon',
-  caly: 'Calyrex-Shadow',
-  calys: 'Calyrex-Shadow',
-  calyi: 'Calyrex-Ice',
-  deo: 'Deoxys-Attack',
-  deos: 'Deoxys-Speed',
-};
-
-const ABILITY_ON_LIST = new Set([
-  'Protosynthesis', 'Quark Drive', 'Drought', 'Drizzle',
-  'Sand Stream', 'Snow Warning', 'Orichalcum Pulse', 'Hadron Engine',
-  'Sword of Ruin', 'Beads of Ruin', 'Tablets of Ruin', 'Vessel of Ruin',
-]);
-
-// --- Field condition keywords ---
-
-const RUIN_PHRASES: Record<string, keyof FieldConditions> = {
-  'beads of ruin': 'isBeadsOfRuin',
-  'sword of ruin': 'isSwordOfRuin',
-  'tablets of ruin': 'isTabletsOfRuin',
-  'vessel of ruin': 'isVesselOfRuin',
-};
-
-const TERRAIN_PHRASES: Record<string, FieldConditions['terrain']> = {
-  'psychic terrain': 'Psychic',
-  'electric terrain': 'Electric',
-  'grassy terrain': 'Grassy',
-  'misty terrain': 'Misty',
-};
-
-const SIDE_CONDITION_PHRASES: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
-  'helping hand': { field: 'attackerSide', key: 'isHelpingHand' },
-  'light screen': { field: 'defenderSide', key: 'isLightScreen' },
-  'aurora veil': { field: 'defenderSide', key: 'isAuroraVeil' },
-  'friend guard': { field: 'defenderSide', key: 'isFriendGuard' },
-};
-
-const WEATHER_KEYWORDS: Record<string, FieldConditions['weather']> = {
-  sun: 'Sun', sunny: 'Sun',
-  rain: 'Rain', rainy: 'Rain',
-  sand: 'Sand', sandstorm: 'Sand',
-  snow: 'Snow',
-  hail: 'Hail',
-};
-
-const SINGLE_SIDE_CONDITIONS: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
-  reflect: { field: 'defenderSide', key: 'isReflect' },
-  tailwind: { field: 'attackerSide', key: 'isTailwind' },
-};
-
-const ABILITY_FIELD_MAP: Record<string, (fc: FieldConditions) => void> = {
-  'Drought': (fc) => { if (!fc.weather) fc.weather = 'Sun'; },
-  'Orichalcum Pulse': (fc) => { if (!fc.weather) fc.weather = 'Sun'; },
-  'Drizzle': (fc) => { if (!fc.weather) fc.weather = 'Rain'; },
-  'Sand Stream': (fc) => { if (!fc.weather) fc.weather = 'Sand'; },
-  'Snow Warning': (fc) => { if (!fc.weather) fc.weather = 'Snow'; },
-  'Hadron Engine': (fc) => { if (!fc.terrain) fc.terrain = 'Electric'; },
-  'Beads of Ruin': (fc) => { fc.isBeadsOfRuin = true; },
-  'Sword of Ruin': (fc) => { fc.isSwordOfRuin = true; },
-  'Tablets of Ruin': (fc) => { fc.isTabletsOfRuin = true; },
-  'Vessel of Ruin': (fc) => { fc.isVesselOfRuin = true; },
-};
 
 // --- Helpers ---
 
@@ -196,33 +69,6 @@ export interface ParseContext {
   /** The attacker's move (used by defender to resolve deferred stat patterns). */
   opposingMove?: string;
 }
-
-/** Map an offensive stat to the most common nature boosting it. */
-const OFFENSIVE_NATURE: Partial<Record<StatKey, string>> = {
-  atk: 'Adamant',
-  spa: 'Modest',
-  def: 'Bold',
-  spd: 'Calm',
-  spe: 'Jolly',
-};
-
-/** Map (boosted stat, lowered stat) → nature name */
-const NATURE_TABLE: Record<string, string> = {
-  'atk,def': 'Lonely', 'atk,spa': 'Adamant', 'atk,spd': 'Naughty', 'atk,spe': 'Brave',
-  'def,atk': 'Bold', 'def,spa': 'Impish', 'def,spd': 'Lax', 'def,spe': 'Relaxed',
-  'spa,atk': 'Modest', 'spa,def': 'Mild', 'spa,spd': 'Rash', 'spa,spe': 'Quiet',
-  'spd,atk': 'Calm', 'spd,def': 'Gentle', 'spd,spa': 'Careful', 'spd,spe': 'Sassy',
-  'spe,atk': 'Timid', 'spe,def': 'Hasty', 'spe,spa': 'Jolly', 'spe,spd': 'Naive',
-};
-
-/** Default stat to boost when only given a stat to lower (no EV context). */
-const DEFAULT_BOOST_FOR_LOWER: Partial<Record<StatKey, StatKey>> = {
-  atk: 'spa',  // Min Atk → Modest (+SpA -Atk)
-  spa: 'atk',  // Min SpA → Adamant (+Atk -SpA)
-  spe: 'atk',  // Min Spe → Brave (+Atk -Spe)
-  def: 'spe',  // Min Def → Hasty (+Spe -Def)
-  spd: 'spe',  // Min SpD → Naive (+Spe -SpD)
-};
 
 /** Given a stat to lower and an EV spread, pick the best nature. */
 function findNatureForMinStat(
@@ -271,6 +117,13 @@ function tryGreedyMatch(
     if (match) return { name: match, count: len };
   }
   return null;
+}
+
+function isEntityStart(tokens: string[], i: number, consumed: boolean[]): boolean {
+  if (i + 1 >= tokens.length || consumed[i + 1]) return false;
+  const twoWordId = toID(tokens[i] + tokens[i + 1]);
+  return abilityById.has(twoWordId) || moveById.has(twoWordId) ||
+         speciesById.has(twoWordId) || itemById.has(twoWordId);
 }
 
 function prefixMatchSpecies(token: string): string | undefined {
@@ -480,9 +333,28 @@ export function parseInput(input: string, context?: ParseContext): ParseResult {
       }
     }
 
-    // Weather (1-word)
+    // Weather: "in <weather>" / "in the <weather>" / "(in <weather>)" syntax
+    const strippedLower = lower.replace(/^\(/, '');
+    if (strippedLower === 'in' && i + 1 < tokens.length && !consumed[i + 1]) {
+      let weatherIdx = i + 1;
+      if (tokens[i + 1].toLowerCase() === 'the' && i + 2 < tokens.length && !consumed[i + 2]) {
+        weatherIdx = i + 2;
+      }
+      if (!consumed[weatherIdx]) {
+        const weatherToken = tokens[weatherIdx].toLowerCase().replace(/\)$/, '');
+        const inWeatherVal = WEATHER_KEYWORDS[weatherToken];
+        if (inWeatherVal) {
+          if (!result.fieldConditions) result.fieldConditions = {};
+          result.fieldConditions.weather = inWeatherVal;
+          for (let j = i; j <= weatherIdx; j++) consumed[j] = true;
+          continue;
+        }
+      }
+    }
+
+    // Weather (1-word) — guarded against stealing multi-word entity tokens
     const weatherVal = WEATHER_KEYWORDS[lower];
-    if (weatherVal) {
+    if (weatherVal && !isEntityStart(tokens, i, consumed)) {
       if (!result.fieldConditions) result.fieldConditions = {};
       result.fieldConditions.weather = weatherVal;
       consumed[i] = true;

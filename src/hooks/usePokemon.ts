@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
-import type { PokemonState, StatsTable, StatKey, ParseResult } from '../types';
-import { MAX_EV_PER_STAT, MAX_TOTAL_EVS, STAT_KEYS } from '../types';
-import { getSpeciesAbilities } from '../data/gen';
+import { useCallback,useState } from 'react';
+
+import { getSpeciesAbilities } from '~/data/gen';
+import type { ParseResult,PokemonState, StatKey, StatsTable } from '~/types';
+import { MAX_EV_PER_STAT, MAX_TOTAL_EVS, STAT_KEYS } from '~/types';
 
 const defaultEvs = (): StatsTable => ({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
 const defaultIvs = (): StatsTable => ({ hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 });
