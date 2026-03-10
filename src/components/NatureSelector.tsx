@@ -4,6 +4,7 @@ import type { StatKey } from '~/types';
 import { STAT_LABELS } from '~/types';
 
 interface Props {
+  id?: string;
   value: string;
   onChange: (nature: string) => void;
 }
@@ -20,8 +21,8 @@ const natureLabelMap = new Map(
   }),
 );
 
-export const NatureSelector = ({ value, onChange }: Props) => <Typeahead
-      id="nature-select"
+export const NatureSelector = ({ id = 'nature-select', value, onChange }: Props) => <Typeahead
+      id={id}
       label="Nature"
       value={value}
       onChange={onChange}
