@@ -16,8 +16,8 @@ interface Props {
   modifiers: SelectedPokemonModifiers;
   idPrefix: string;
   showCrit: boolean;
-  move: string;
-  onMoveChange: (move: string) => void;
+  move?: string;
+  onMoveChange?: (move: string) => void;
   onUpdate: (patch: Partial<SelectedPokemonModifiers>) => void;
   onBoostChange: (stat: StatKey, value: number) => void;
 }
@@ -31,15 +31,18 @@ export const SelectedPokemonModifierInputs = ({
   onUpdate,
   onBoostChange,
 }: Props) => (
-  <div className="py-2 mb-2 border-b border-border-section">
+  <div className="py-2 mb-2">
     <div className="flex flex-wrap items-end gap-2 mb-2">
-      <div className="min-w-[120px] flex-1 basis-[120px]">
-        <MoveSelector
-          id={`${idPrefix}-fm-move`}
-          value={move}
-          onChange={onMoveChange}
-        />
-      </div>
+      {move !== undefined && onMoveChange && (
+        <div className="min-w-[120px] flex-1 basis-[120px]">
+          <MoveSelector
+            id={`${idPrefix}-fm-move`}
+            value={move}
+            onChange={onMoveChange}
+            className="!mb-0"
+          />
+        </div>
+      )}
       <div className="min-w-[120px] flex-1 basis-[120px]">
         <Typeahead
           id={`${idPrefix}-fm-tera`}
