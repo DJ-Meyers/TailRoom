@@ -1,13 +1,14 @@
 import { Typeahead } from '~/components/Typeahead';
 
 interface Props {
+  id?: string;
   value: string;
   onChange: (ability: string) => void;
   abilities: string[];
 }
 
-export const AbilitySelector = ({ value, onChange, abilities }: Props) => <Typeahead
-      id="ability-select"
+export const AbilitySelector = ({ id = 'ability-select', value, onChange, abilities }: Props) => <Typeahead
+      id={id}
       label="Ability"
       value={value}
       onChange={onChange}

@@ -32,18 +32,19 @@ export const ParseInput = ({ onParsed, label, parseContext }: Props) => {
   );
 
   return (
-    <div className="parse-input">
+    <div className="flex flex-wrap gap-1.5 mb-4">
       <input
         id={`${label}-parse`}
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder='e.g. "Max SpA Specs Modest Flutter Moonblast"'
+        placeholder='e.g. "Max SpA Specs Flutter"'
+        className="flex-1 px-2 py-1.5 border border-border rounded text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
-      <button onClick={handleSubmit}>Apply</button>
+      <button onClick={handleSubmit} className="px-3 py-1.5 border-none rounded bg-primary text-bg text-sm font-semibold cursor-pointer hover:bg-primary-hover">Apply</button>
       {unmatched.length > 0 && (
-        <p className="parse-warnings">
+        <p className="text-xs text-accent mt-1 basis-full">
           Unrecognized: {unmatched.join(', ')}
         </p>
       )}

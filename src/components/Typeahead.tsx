@@ -10,6 +10,7 @@ interface Props {
   allowEmpty?: boolean;
   emptyLabel?: string;
   getLabel?: (value: string) => string;
+  className?: string;
 }
 
 export const Typeahead = ({
@@ -22,6 +23,7 @@ export const Typeahead = ({
   allowEmpty = false,
   emptyLabel = '(none)',
   getLabel,
+  className,
 }: Props) => {
   const displayValue = (v: string) => (getLabel ? getLabel(v) : v);
   const [query, setQuery] = useState(displayValue(value));
@@ -115,8 +117,8 @@ export const Typeahead = ({
   }, [value]);
 
   return (
-    <div className="selector typeahead" ref={containerRef}>
-      <label htmlFor={id}>{label}</label>
+    <div className={`relative mb-3 ${className ?? ''}`} ref={containerRef}>
+      <label htmlFor={id} className="block text-xs font-semibold text-text-muted mb-0.5">{label}</label>
       <input
         id={id}
         type="text"
@@ -126,16 +128,17 @@ export const Typeahead = ({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         autoComplete="off"
+        className="w-full px-2 py-1.5 border border-border rounded text-sm bg-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
       {open && (
-        <ul className="typeahead-list" ref={listRef}>
+        <ul className="absolute z-10 left-0 right-0 max-h-[200px] overflow-y-auto list-none bg-surface border border-border border-t-0 rounded-b shadow-md" ref={listRef}>
           {allItems.length === 0 && (
-            <li className="typeahead-item typeahead-empty">No matches</li>
+            <li className="px-2 py-1 text-sm text-text-dim italic cursor-default">No matches</li>
           )}
           {allItems.map((item, i) => (
             <li
               key={item || '__empty__'}
-              className={`typeahead-item${i === highlightIndex ? ' highlighted' : ''}${item === value ? ' selected' : ''}`}
+              className={`px-2 py-1 text-sm cursor-pointer ${i === highlightIndex ? 'bg-highlight' : ''} ${item === value ? 'font-semibold' : ''}`}
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleSelect(item);
