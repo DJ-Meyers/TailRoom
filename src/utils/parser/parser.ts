@@ -171,6 +171,34 @@ export const parseInput = (input: string, context?: ParseContext): ParseResult =
     if (consumed[i]) continue;
     const lower = tokens[i].toLowerCase();
 
+    // HP/Def shorthand (space-separated): "252 140+" → 252 HP EVs, 140 Def EVs, +Def nature
+    // Must appear before the "\d+\+" handler to intercept the second number
+    if (/^\d+$/.test(tokens[i]) && i + 1 < tokens.length && !consumed[i + 1]) {
+      const defSpreadMatch = tokens[i + 1].match(/^(\d+)([+-])$/);
+      if (defSpreadMatch) {
+        const followingStat = (i + 2 < tokens.length && !consumed[i + 2]) ? resolveStat(tokens[i + 2]) : undefined;
+        if (!followingStat) {
+          if (!result.evs) result.evs = {};
+          result.evs.hp = Math.min(parseInt(tokens[i], 10), 252);
+          result.evs.def = Math.min(parseInt(defSpreadMatch[1], 10), 252);
+          if (defSpreadMatch[2] === '+') deferredNature = OFFENSIVE_NATURE['def'];
+          consumed[i] = consumed[i + 1] = true;
+          continue;
+        }
+      }
+    }
+
+    // HP/Def shorthand (slash-combined): "252/140+" → 252 HP EVs, 140 Def EVs, +Def nature
+    const slashSpreadMatch = tokens[i].match(/^(\d+)\/(\d+)([+-])?$/);
+    if (slashSpreadMatch) {
+      if (!result.evs) result.evs = {};
+      result.evs.hp = Math.min(parseInt(slashSpreadMatch[1], 10), 252);
+      result.evs.def = Math.min(parseInt(slashSpreadMatch[2], 10), 252);
+      if (slashSpreadMatch[3] === '+') deferredNature = OFFENSIVE_NATURE['def'];
+      consumed[i] = true;
+      continue;
+    }
+
     // "252+" or "max+" — max EVs + boosting nature
     // If followed by a stat name (e.g. "252+ SpA"), resolve immediately; otherwise defer to move
     if (/^\d+\+$/.test(tokens[i]) || lower === 'max+') {
@@ -534,8 +562,194 @@ export const parseInput = (input: string, context?: ParseContext): ParseResult =
   return result;
 };
 
+/**
+ * Parse modifier-only input (move + tera/boosts/status/crit/field conditions).
+ * Used for the selected pokemon side of "vs" in offensive mode, where species/item/ability/EVs/nature
+ * are already set on the selected pokemon panel.
+ */
+export const parseModifiers = (input: string, context?: ParseContext): ParseResult => {
+  const tokens = input.trim().split(/\s+/).filter(Boolean);
+  const consumed = new Array<boolean>(tokens.length).fill(false);
+  const result: ParseResult = { unmatched: [] };
+  let deferredBoost: number | null = null;
+
+  // --- Pass 1: Structural patterns (modifiers only, no EVs/levels) ---
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (consumed[i]) continue;
+    const lower = tokens[i].toLowerCase();
+
+    // "Tera <Type>"
+    if (lower === 'tera' && i + 1 < tokens.length && !consumed[i + 1]) {
+      const typeMatch = typeById.get(toID(tokens[i + 1]));
+      if (typeMatch) {
+        result.teraType = typeMatch;
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+    }
+
+    // Boost patterns: "+2 SpA" (with stat) or standalone "+2" (deferred to move's stat)
+    if (/^[+-]\d$/.test(tokens[i])) {
+      const nextStat = (i + 1 < tokens.length && !consumed[i + 1])
+        ? resolveStat(tokens[i + 1])
+        : undefined;
+      if (nextStat && nextStat !== 'hp') {
+        const boost = parseInt(tokens[i], 10);
+        if (!result.boosts) result.boosts = {};
+        result.boosts[nextStat] = Math.max(-6, Math.min(6, boost));
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+      deferredBoost = parseInt(tokens[i], 10);
+      consumed[i] = true;
+      continue;
+    }
+
+    // Crit keyword
+    if (lower === 'crit') {
+      result.isCrit = true;
+      consumed[i] = true;
+      continue;
+    }
+
+    // "boosted" keyword → sets boostedStat for Protosynthesis/Quark Drive
+    if (lower === 'boosted') {
+      result.abilityOn = true;
+      result.boostedStat = 'auto';
+      consumed[i] = true;
+      continue;
+    }
+
+    // Ruin phrases (3-word)
+    if (i + 2 < tokens.length && !consumed[i + 1] && !consumed[i + 2]) {
+      const threeWord = [tokens[i], tokens[i + 1], tokens[i + 2]].join(' ').toLowerCase();
+      const ruinKey = RUIN_PHRASES[threeWord];
+      if (ruinKey) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        (result.fieldConditions as any)[ruinKey] = true;
+        consumed[i] = consumed[i + 1] = consumed[i + 2] = true;
+        continue;
+      }
+    }
+
+    // Terrain (2-word)
+    if (i + 1 < tokens.length && !consumed[i + 1]) {
+      const twoWord = [tokens[i], tokens[i + 1]].join(' ').toLowerCase();
+      const terrainVal = TERRAIN_PHRASES[twoWord];
+      if (terrainVal) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        result.fieldConditions.terrain = terrainVal;
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+      // Side conditions (2-word)
+      const sideCondition = SIDE_CONDITION_PHRASES[twoWord];
+      if (sideCondition) {
+        if (!result.fieldConditions) result.fieldConditions = {};
+        if (!result.fieldConditions[sideCondition.field]) {
+          result.fieldConditions[sideCondition.field] = {} as any;
+        }
+        (result.fieldConditions[sideCondition.field] as any)[sideCondition.key] = true;
+        consumed[i] = consumed[i + 1] = true;
+        continue;
+      }
+    }
+
+    // Weather: "in <weather>" / "in the <weather>" / "(in <weather>)" syntax
+    const strippedLower = lower.replace(/^\(/, '');
+    if (strippedLower === 'in' && i + 1 < tokens.length && !consumed[i + 1]) {
+      let weatherIdx = i + 1;
+      if (tokens[i + 1].toLowerCase() === 'the' && i + 2 < tokens.length && !consumed[i + 2]) {
+        weatherIdx = i + 2;
+      }
+      if (!consumed[weatherIdx]) {
+        const weatherToken = tokens[weatherIdx].toLowerCase().replace(/\)$/, '');
+        const inWeatherVal = WEATHER_KEYWORDS[weatherToken];
+        if (inWeatherVal) {
+          if (!result.fieldConditions) result.fieldConditions = {};
+          result.fieldConditions.weather = inWeatherVal;
+          for (let j = i; j <= weatherIdx; j++) consumed[j] = true;
+          continue;
+        }
+      }
+    }
+
+    // Weather (1-word) — guarded against stealing multi-word entity tokens
+    const weatherVal = WEATHER_KEYWORDS[lower];
+    if (weatherVal && !isEntityStart(tokens, i, consumed)) {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      result.fieldConditions.weather = weatherVal;
+      consumed[i] = true;
+      continue;
+    }
+
+    // Single-word side conditions (reflect, tailwind)
+    const singleSide = SINGLE_SIDE_CONDITIONS[lower];
+    if (singleSide) {
+      if (!result.fieldConditions) result.fieldConditions = {};
+      if (!result.fieldConditions[singleSide.field]) {
+        result.fieldConditions[singleSide.field] = {} as any;
+      }
+      (result.fieldConditions[singleSide.field] as any)[singleSide.key] = true;
+      consumed[i] = true;
+      continue;
+    }
+
+    // Status keywords
+    const statusMatch = STATUS_ALIASES[lower];
+    if (statusMatch) {
+      result.status = statusMatch;
+      consumed[i] = true;
+      continue;
+    }
+
+    // Slash separator
+    if (tokens[i] === '/') {
+      consumed[i] = true;
+      continue;
+    }
+  }
+
+  // --- Pass 2: Move matching only ---
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (consumed[i]) continue;
+
+    if (!result.move) {
+      const m = tryGreedyMatch(tokens, i, consumed, moveById);
+      if (m) {
+        result.move = m.name;
+        for (let j = i; j < i + m.count; j++) consumed[j] = true;
+        continue;
+      }
+    }
+  }
+
+  // --- Collect unmatched tokens ---
+  for (let i = 0; i < tokens.length; i++) {
+    if (!consumed[i]) result.unmatched.push(tokens[i]);
+  }
+
+  // --- Post-processing: resolve deferred boost ---
+  if (deferredBoost !== null) {
+    let targetStat: StatKey | undefined;
+    if (context?.role === 'defender' && context.opposingMove) {
+      targetStat = getDefensiveStat(context.opposingMove);
+    } else if (result.move) {
+      targetStat = getOffensiveStat(result.move);
+    }
+    if (targetStat) {
+      if (!result.boosts) result.boosts = {};
+      result.boosts[targetStat] = Math.max(-6, Math.min(6, deferredBoost));
+    }
+  }
+
+  return result;
+};
+
 /** Merge two FieldConditions, with `b` taking precedence for weather/terrain. */
-const mergeFieldConditions = (a: FieldConditions, b: FieldConditions): FieldConditions => ({
+export const mergeFieldConditions = (a: FieldConditions, b: FieldConditions): FieldConditions => ({
     weather: b.weather ?? a.weather,
     terrain: b.terrain ?? a.terrain,
     isBeadsOfRuin: a.isBeadsOfRuin || b.isBeadsOfRuin || undefined,

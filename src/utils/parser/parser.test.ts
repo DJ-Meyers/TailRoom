@@ -1,6 +1,6 @@
 import { describe, expect,it } from 'vitest';
 
-import { parseInput, parseVsInput } from '~/utils/parser/parser';
+import { parseInput, parseModifiers, parseVsInput } from '~/utils/parser/parser';
 
 describe('parseInput', () => {
   // --- VGC full-string examples (the user's reported cases) ---
@@ -222,6 +222,39 @@ describe('parseInput', () => {
       expect(r.evs?.def).toBe(0);
       expect(r.ivs).toBeUndefined();
       expect(r.species).toBe('Clefable');
+    });
+  });
+
+  // --- HP/Def shorthand ---
+
+  describe('HP/Def shorthand', () => {
+    it('"252 140+ Incineroar" → 252 HP, 140 Def, +Def nature (Bold)', () => {
+      const r = parseInput('252 140+ Incineroar');
+      expect(r.species).toBe('Incineroar');
+      expect(r.evs).toEqual({ hp: 252, def: 140 });
+      expect(r.nature).toBe('Bold');
+      expect(r.unmatched).toEqual([]);
+    });
+
+    it('"252/140+ Incin" → 252 HP, 140 Def, +Def nature (Bold)', () => {
+      const r = parseInput('252/140+ Incin');
+      expect(r.species).toBe('Incineroar');
+      expect(r.evs).toEqual({ hp: 252, def: 140 });
+      expect(r.nature).toBe('Bold');
+      expect(r.unmatched).toEqual([]);
+    });
+
+    it('"252/140 Incineroar" without + sets EVs but no nature', () => {
+      const r = parseInput('252/140 Incineroar');
+      expect(r.evs).toEqual({ hp: 252, def: 140 });
+      expect(r.nature).toBeUndefined();
+    });
+
+    it('does not trigger when followed by a stat name', () => {
+      const r = parseInput('140+ SpA Gardevoir');
+      expect(r.evs?.spa).toBe(140);
+      expect(r.nature).toBe('Modest');
+      expect(r.evs?.def).toBeUndefined();
     });
   });
 
@@ -670,6 +703,88 @@ describe('parseInput', () => {
         expect(r.fieldConditions?.terrain).toBeUndefined();
       });
     });
+  });
+});
+
+describe('parseModifiers', () => {
+  it('parses a move name', () => {
+    const r = parseModifiers('Surging Strikes');
+    expect(r.move).toBe('Surging Strikes');
+    expect(r.unmatched).toEqual([]);
+  });
+
+  it('parses Tera type + move', () => {
+    const r = parseModifiers('Tera Water Surging Strikes');
+    expect(r.move).toBe('Surging Strikes');
+    expect(r.teraType).toBe('Water');
+    expect(r.unmatched).toEqual([]);
+  });
+
+  it('parses boost + crit + move', () => {
+    const r = parseModifiers('+2 Crit Earthquake');
+    expect(r.move).toBe('Earthquake');
+    expect(r.boosts?.atk).toBe(2);
+    expect(r.isCrit).toBe(true);
+  });
+
+  it('parses status + move', () => {
+    const r = parseModifiers('burned Close Combat');
+    expect(r.move).toBe('Close Combat');
+    expect(r.status).toBe('brn');
+  });
+
+  it('parses move + field condition', () => {
+    const r = parseModifiers('Earthquake in rain');
+    expect(r.move).toBe('Earthquake');
+    expect(r.fieldConditions?.weather).toBe('Rain');
+  });
+
+  it('parses helping hand + move', () => {
+    const r = parseModifiers('helping hand Moonblast');
+    expect(r.move).toBe('Moonblast');
+    expect(r.fieldConditions?.attackerSide?.isHelpingHand).toBe(true);
+  });
+
+  it('does not assign species/item/ability fields', () => {
+    const r = parseModifiers('Flutter Mane Choice Specs Protosynthesis Earthquake');
+    expect(r.move).toBe('Earthquake');
+    expect(r.species).toBeUndefined();
+    expect(r.item).toBeUndefined();
+    expect(r.ability).toBeUndefined();
+    // species/item/ability tokens end up as unmatched
+    expect(r.unmatched).toContain('Flutter');
+    expect(r.unmatched).toContain('Mane');
+    expect(r.unmatched).toContain('Choice');
+    expect(r.unmatched).toContain('Specs');
+    expect(r.unmatched).toContain('Protosynthesis');
+  });
+
+  it('does not consume EV-like tokens as EVs', () => {
+    const r = parseModifiers('252 SpA Moonblast');
+    expect(r.move).toBe('Moonblast');
+    expect(r.evs).toBeUndefined();
+    // "252" and "SpA" are unmatched (not consumed as EVs)
+    expect(r.unmatched).toContain('252');
+  });
+
+  it('does not consume level patterns', () => {
+    const r = parseModifiers('Lvl 50 Earthquake');
+    expect(r.move).toBe('Earthquake');
+    expect(r.level).toBeUndefined();
+    expect(r.unmatched).toContain('Lvl');
+    expect(r.unmatched).toContain('50');
+  });
+
+  it('resolves deferred boost to move offensive stat', () => {
+    const r = parseModifiers('+2 Moonblast');
+    expect(r.boosts?.spa).toBe(2);
+  });
+
+  it('parses boosted keyword', () => {
+    const r = parseModifiers('boosted Dazzling Gleam');
+    expect(r.move).toBe('Dazzling Gleam');
+    expect(r.abilityOn).toBe(true);
+    expect(r.boostedStat).toBe('auto');
   });
 });
 

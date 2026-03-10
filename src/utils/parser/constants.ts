@@ -47,6 +47,7 @@ export const SPECIES_ALIASES: Record<string, string> = {
   corv: 'Corviknight',
   clef: 'Clefable',
   chomp: 'Garchomp',
+  incin: 'Incineroar',
   flutter: 'Flutter Mane',
   rilla: 'Rillaboom',
   ghold: 'Gholdengo',
