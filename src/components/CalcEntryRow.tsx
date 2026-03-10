@@ -1,6 +1,6 @@
 import { toID } from '@smogon/calc';
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { FieldConditionInputs } from '~/components/FieldConditionInputs';
 import { ItemIcon } from '~/components/ItemIcon';
@@ -9,6 +9,7 @@ import { PokemonPanel } from '~/components/PokemonPanel';
 import { SelectedPokemonModifierInputs } from '~/components/SelectedPokemonModifierInputs';
 import { TargetModifierInputs } from '~/components/TargetModifierInputs';
 import { TypeIcon } from '~/components/TypeIcon';
+import { WeatherIcon } from '~/components/WeatherIcon';
 import { gen, getSpeciesAbilities } from '~/data/gen';
 import type { CalcEntry, FieldConditions, PokemonState, SelectedPokemonModifiers, StatKey } from '~/types';
 import { computeDamage, type DamageCalcResult } from '~/utils/calcDamage';
@@ -39,9 +40,23 @@ const STATUS_SUMMARY: Record<string, string> = {
   frz: 'Freeze',
 };
 
+const ATK_STAT_LABEL: Record<string, string> = {
+  atk: 'Atk',
+  spa: 'SpA',
+};
+
 const DEF_STAT_LABEL: Record<string, string> = {
   def: 'Def',
   spd: 'SpD',
+};
+
+const getKoTierColor = (koChance: string, mode: 'offensive' | 'defensive'): string => {
+  const invert = mode === 'defensive';
+  if (koChance.includes('guaranteed OHKO')) return invert ? 'text-ko-no-2hko' : 'text-ko-guaranteed-ohko';
+  if (koChance.includes('OHKO')) return invert ? 'text-ko-chance-2hko' : 'text-ko-chance-ohko';
+  if (koChance.includes('guaranteed 2HKO')) return 'text-ko-guaranteed-2hko';
+  if (koChance.includes('2HKO')) return invert ? 'text-ko-chance-ohko' : 'text-ko-chance-2hko';
+  return invert ? 'text-ko-guaranteed-ohko' : 'text-ko-no-2hko';
 };
 
 const formatSummary = (
@@ -51,16 +66,18 @@ const formatSummary = (
   mode: 'offensive' | 'defensive',
   result: DamageCalcResult | null,
   defenderMaxHp: number,
+  fieldConditions: FieldConditions,
 ): ReactNode => {
   if (!result) {
-    if (mode === 'offensive') return <>{moveName} · <PokemonIcon species={defender.species} /><ItemIcon item={defender.item} /></>;
-    return <><PokemonIcon species={attacker.species} /><ItemIcon item={attacker.item} /> {moveName}</>;
+    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{moveName} <PokemonIcon species={defender.species} /><ItemIcon item={defender.item} /></>;
+    return <><WeatherIcon weather={fieldConditions.weather} /><PokemonIcon species={attacker.species} /><ItemIcon item={attacker.item} /> {moveName}</>;
   }
 
   const pct = (val: number) => ((val / defenderMaxHp) * 100).toFixed(1);
   const range = `${pct(result.range[0])}%-${pct(result.range[1])}%`;
   const koMatch = result.koChance.match(/^([\d.]+)% chance to (\dHKO)$/);
   const ko = koMatch ? ` ${koMatch[1]}% ${koMatch[2]}` : '';
+  const koColor = result.koChance ? getKoTierColor(result.koChance, mode) : 'text-text-faint';
 
   const moveData = gen.moves.get(toID(moveName));
   const isSpecial = moveData?.category === 'Special';
@@ -79,12 +96,18 @@ const formatSummary = (
   if (attacker.status) {
     atkMods.push(STATUS_SUMMARY[attacker.status] ?? attacker.status);
   }
-  if (attacker.isCrit) {
+  if (attacker.isCrit && !moveData?.willCrit) {
     atkMods.push('Crit');
   }
   const atkPrefix = atkMods.length > 0
     ? <>{atkMods.map((mod, i) => <span key={i}>{i > 0 ? ' ' : ''}{mod}</span>)}{' '}</>
     : null;
+
+  // Attacker offensive spread: EVs + nature indicator (e.g. "252+")
+  const atkNature = gen.natures.get(toID(attacker.nature));
+  const atkNatureSign = atkNature?.plus === atkStat ? '+' : atkNature?.minus === atkStat ? '-' : '';
+  const atkEvs = attacker.evs[atkStat];
+  const atkSpread = `${atkEvs}${atkNatureSign} ${ATK_STAT_LABEL[atkStat]}`;
 
   // Defender defensive spread: EVs + nature indicator + boost
   const nature = gen.natures.get(toID(defender.nature));
@@ -96,16 +119,30 @@ const formatSummary = (
   const defTera = defender.teraType ? <><TypeIcon typeName={defender.teraType} />{' '}</> : null;
   const defDesc = `${defBoostStr}${hpEVs}/${defEVs}${natureSign} ${DEF_STAT_LABEL[defStat]}`;
 
+  const iconClass = "shrink-0 relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle";
+
+  const weatherIcon = <WeatherIcon weather={fieldConditions.weather} />;
+
   if (mode === 'offensive') {
-    return <>
-      <div>{atkPrefix}{moveName} · {defDesc} {defTera}<PokemonIcon species={defender.species} /><ItemIcon item={defender.item} /></div>
-      <div className="text-xs text-text-faint">{range}{ko}</div>
-    </>;
+    return <span className="flex items-center gap-1 min-w-0">
+      {weatherIcon}
+      <span className="shrink-0">{atkPrefix}{moveName}</span>
+      <span className="shrink-0 text-text-faint">vs</span>
+      <PokemonIcon species={defender.species} className={iconClass} />
+      <span className="min-w-0">
+        <div className="truncate">{defDesc} {defTera}<ItemIcon item={defender.item} /></div>
+        <div className={`text-xs truncate ${koColor}`}>{range}{ko}</div>
+      </span>
+    </span>;
   }
-  return <>
-    <div><PokemonIcon species={attacker.species} /><ItemIcon item={attacker.item} /> {atkPrefix}{moveName} · {defDesc} {defTera}</div>
-    <div className="text-xs text-text-faint">{range}{ko}</div>
-  </>;
+  return <span className="flex items-center gap-1 min-w-0">
+    {weatherIcon}
+    <PokemonIcon species={attacker.species} className={iconClass} />
+    <span className="min-w-0">
+      <div className="truncate"><ItemIcon item={attacker.item} /> {atkPrefix}{atkSpread} {moveName}</div>
+      <div className={`text-xs truncate ${koColor}`}>{range}{ko}</div>
+    </span>
+  </span>;
 };
 
 export const CalcEntryRow = ({
@@ -132,13 +169,35 @@ export const CalcEntryRow = ({
   const attacker = mode === 'offensive' ? selectedPokemonWithMods : entry.opponent;
   const defender = mode === 'offensive' ? entry.opponent : selectedPokemonWithMods;
 
+  // In defensive mode, crit belongs to the opponent (attacker), not the selected Pokémon.
+  // Route the isCrit value and update handler accordingly.
+  const critModifiers = useMemo(
+    () => mode === 'defensive'
+      ? { ...entry.selectedPokemonModifiers, isCrit: entry.opponent.isCrit }
+      : entry.selectedPokemonModifiers,
+    [mode, entry.selectedPokemonModifiers, entry.opponent.isCrit],
+  );
+
+  const handleSelectedModsUpdate = useCallback(
+    (patch: Partial<SelectedPokemonModifiers>) => {
+      if (mode === 'defensive' && patch.isCrit !== undefined) {
+        const { isCrit, ...rest } = patch;
+        onOpponentUpdate({ isCrit });
+        if (Object.keys(rest).length > 0) onSelectedPokemonModifiersUpdate(rest);
+      } else {
+        onSelectedPokemonModifiersUpdate(patch);
+      }
+    },
+    [mode, onOpponentUpdate, onSelectedPokemonModifiersUpdate],
+  );
+
   const result = useMemo(
     () => computeDamage(attacker, defender, entry.move, entry.fieldConditions),
     [attacker, defender, entry.move, entry.fieldConditions],
   );
 
   const defenderMaxHp = result?.defenderMaxHp ?? 1;
-  const summary = formatSummary(entry.move, attacker, defender, mode, result, defenderMaxHp);
+  const summary = formatSummary(entry.move, attacker, defender, mode, result, defenderMaxHp, entry.fieldConditions);
   const abilities = getSpeciesAbilities(entry.opponent.species);
   const prefix = `entry-${entry.id}`;
 
@@ -161,15 +220,39 @@ export const CalcEntryRow = ({
       </div>
       {entry.isExpanded && (
         <div className="p-3 border-t border-border-lighter bg-detail-bg">
-          <SelectedPokemonModifierInputs
-            modifiers={entry.selectedPokemonModifiers}
-            idPrefix={prefix}
-            showCrit={mode === 'offensive'}
-            move={entry.move}
-            onMoveChange={onMoveChange}
-            onUpdate={onSelectedPokemonModifiersUpdate}
-            onBoostChange={onSelectedPokemonBoostChange}
-          />
+          {mode === 'defensive' ? (
+            <>
+              <div className="flex items-end gap-1 mb-1 leading-none">
+                <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+                <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
+              </div>
+              <TargetModifierInputs
+                state={entry.opponent}
+                idPrefix={prefix}
+                showCrit={false}
+                move={entry.move}
+                onMoveChange={onMoveChange}
+                onUpdate={onOpponentUpdate}
+                onBoostChange={onBoostChange}
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex items-end gap-1 mb-1 leading-none">
+                <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+                <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
+              </div>
+              <SelectedPokemonModifierInputs
+                modifiers={critModifiers}
+                idPrefix={prefix}
+                showCrit
+                move={entry.move}
+                onMoveChange={onMoveChange}
+                onUpdate={handleSelectedModsUpdate}
+                onBoostChange={onSelectedPokemonBoostChange}
+              />
+            </>
+          )}
           <FieldConditionInputs
             field={entry.fieldConditions}
             idPrefix={prefix}
@@ -214,13 +297,35 @@ export const CalcEntryRow = ({
               if (Object.keys(patch).length > 0) onOpponentUpdate(patch);
             }}
           />
-          <TargetModifierInputs
-            state={entry.opponent}
-            idPrefix={prefix}
-            showCrit={mode === 'defensive'}
-            onUpdate={onOpponentUpdate}
-            onBoostChange={onBoostChange}
-          />
+          {mode === 'offensive' ? (
+            <>
+              <div className="flex items-end gap-1 mb-1 leading-none">
+                <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+                <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
+              </div>
+              <TargetModifierInputs
+                state={entry.opponent}
+                idPrefix={prefix}
+                showCrit={false}
+                onUpdate={onOpponentUpdate}
+                onBoostChange={onBoostChange}
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex items-end gap-1 mb-1 leading-none">
+                <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+                <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
+              </div>
+              <SelectedPokemonModifierInputs
+                modifiers={critModifiers}
+                idPrefix={prefix}
+                showCrit
+                onUpdate={handleSelectedModsUpdate}
+                onBoostChange={onSelectedPokemonBoostChange}
+              />
+            </>
+          )}
         </div>
       )}
     </div>
