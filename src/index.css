@@ -2,6 +2,15 @@
 @import "./palettes.css";
 
 @theme {
+  --color-bg: #1a1a2e;
+  --color-surface: #242442;
+  --color-surface-hover: #2e2e52;
+  --color-text: #e0e0e8;
+  --color-text-muted: #9090a8;
+  --color-primary: #6c63ff;
+  --color-primary-hover: #5a52e0;
+  --color-accent: #f0ad4e;
+  --color-error: #e05555;
   --breakpoint-md: 800px;
   --color-border: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
   --color-border-light: color-mix(in srgb, var(--color-text-muted) 20%, transparent);
@@ -14,6 +23,11 @@
   --color-detail-bg: var(--color-surface);
   --color-hover-bg: var(--color-surface-hover);
   --color-highlight: var(--color-surface-hover);
+  --color-ko-guaranteed-ohko: #4caf50;
+  --color-ko-chance-ohko: #a3c44a;
+  --color-ko-guaranteed-2hko: #e8d44d;
+  --color-ko-chance-2hko: #e8913a;
+  --color-ko-no-2hko: #e05555;
 }
 
 body {
