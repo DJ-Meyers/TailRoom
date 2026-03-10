@@ -1,33 +1,14 @@
-import { useCallback,useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { getSpeciesAbilities } from '~/data/gen';
-import type { ParseResult,PokemonState, StatKey, StatsTable } from '~/types';
+import type { ParseResult, PokemonState, StatKey } from '~/types';
 import { MAX_EV_PER_STAT, MAX_TOTAL_EVS, STAT_KEYS } from '~/types';
+import { applyParsedToState, createDefaultPokemonState } from '~/utils/pokemonState';
 
-const defaultEvs = (): StatsTable => ({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
-const defaultIvs = (): StatsTable => ({ hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 });
-const defaultBoosts = (): StatsTable => ({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
-
-export const usePokemon = (initialSpecies: string, initialMove: string) => {
-  const [state, setState] = useState<PokemonState>(() => {
-    const abilities = getSpeciesAbilities(initialSpecies);
-    return {
-      species: initialSpecies,
-      level: 50,
-      nature: 'Hardy',
-      ability: abilities[0] ?? '',
-      item: '',
-      evs: defaultEvs(),
-      ivs: defaultIvs(),
-      move: initialMove,
-      teraType: '',
-      boosts: defaultBoosts(),
-      status: '',
-      isCrit: false,
-      abilityOn: false,
-      boostedStat: '',
-    };
-  });
+export const usePokemon = (initialSpecies: string, initialMove: string, overrides?: Partial<PokemonState>) => {
+  const [state, setState] = useState<PokemonState>(() =>
+    createDefaultPokemonState(initialSpecies, initialMove, overrides),
+  );
 
   const setSpecies = useCallback((species: string) => {
     const abilities = getSpeciesAbilities(species);
@@ -91,59 +72,7 @@ export const usePokemon = (initialSpecies: string, initialMove: string) => {
   }, []);
 
   const applyParsed = useCallback((parsed: ParseResult) => {
-    setState((prev) => {
-      const next = { ...prev };
-
-      if (parsed.species) {
-        next.species = parsed.species;
-        const abilities = getSpeciesAbilities(parsed.species);
-        if (parsed.ability && abilities.includes(parsed.ability)) {
-          next.ability = parsed.ability;
-        } else if (parsed.ability) {
-          next.ability = parsed.ability;
-        } else {
-          next.ability = abilities[0] ?? prev.ability;
-        }
-      } else if (parsed.ability) {
-        next.ability = parsed.ability;
-      }
-
-      if (parsed.move) next.move = parsed.move;
-      if (parsed.nature) next.nature = parsed.nature;
-      if (parsed.item !== undefined) next.item = parsed.item;
-      if (parsed.level !== undefined) next.level = parsed.level;
-      if (parsed.teraType !== undefined) next.teraType = parsed.teraType;
-      if (parsed.status !== undefined) next.status = parsed.status;
-      if (parsed.isCrit !== undefined) next.isCrit = parsed.isCrit;
-      if (parsed.abilityOn !== undefined) next.abilityOn = parsed.abilityOn;
-      if (parsed.boostedStat !== undefined) next.boostedStat = parsed.boostedStat;
-
-      if (parsed.evs) {
-        const newEvs = defaultEvs();
-        for (const [k, v] of Object.entries(parsed.evs)) {
-          if (v !== undefined) newEvs[k as StatKey] = v;
-        }
-        next.evs = newEvs;
-      }
-
-      if (parsed.ivs) {
-        const newIvs = defaultIvs();
-        for (const [k, v] of Object.entries(parsed.ivs)) {
-          if (v !== undefined) newIvs[k as StatKey] = v;
-        }
-        next.ivs = newIvs;
-      }
-
-      if (parsed.boosts) {
-        const newBoosts = defaultBoosts();
-        for (const [k, v] of Object.entries(parsed.boosts)) {
-          if (v !== undefined) newBoosts[k as StatKey] = v;
-        }
-        next.boosts = newBoosts;
-      }
-
-      return next;
-    });
+    setState((prev) => applyParsedToState(prev, parsed));
   }, []);
 
   return {

@@ -65,6 +65,24 @@ export interface ParseResult {
   unmatched: string[];
 }
 
+export interface SelectedPokemonModifiers {
+  teraType: string;
+  boosts: StatsTable;
+  status: string;
+  isCrit: boolean;
+  abilityOn: boolean;
+  boostedStat: string;
+}
+
+export interface CalcEntry {
+  id: string;
+  opponent: PokemonState;
+  move: string;
+  fieldConditions: FieldConditions;
+  selectedPokemonModifiers: SelectedPokemonModifiers;
+  isExpanded: boolean;
+}
+
 export const STAT_KEYS: StatKey[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 
 export const STAT_LABELS: Record<StatKey, string> = {
