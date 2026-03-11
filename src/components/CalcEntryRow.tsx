@@ -18,6 +18,7 @@ interface Props {
   entry: CalcEntry;
   selectedPokemon: PokemonState;
   mode: 'offensive' | 'defensive';
+  precomputedResult?: DamageCalcResult | null;
   onToggleExpanded: () => void;
   onRemove: () => void;
   onSpeciesChange: (species: string) => void;
@@ -149,6 +150,7 @@ export const CalcEntryRow = ({
   entry,
   selectedPokemon,
   mode,
+  precomputedResult,
   onToggleExpanded,
   onRemove,
   onSpeciesChange,
@@ -191,10 +193,13 @@ export const CalcEntryRow = ({
     [mode, onOpponentUpdate, onSelectedPokemonModifiersUpdate],
   );
 
-  const result = useMemo(
-    () => computeDamage(attacker, defender, entry.move, entry.fieldConditions),
-    [attacker, defender, entry.move, entry.fieldConditions],
+  const computed = useMemo(
+    () => precomputedResult === undefined
+      ? computeDamage(attacker, defender, entry.move, entry.fieldConditions)
+      : precomputedResult,
+    [precomputedResult, attacker, defender, entry.move, entry.fieldConditions],
   );
+  const result = computed;
 
   const defenderMaxHp = result?.defenderMaxHp ?? 1;
   const summary = formatSummary(entry.move, attacker, defender, mode, result, defenderMaxHp, entry.fieldConditions);

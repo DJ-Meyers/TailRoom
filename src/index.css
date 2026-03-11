@@ -1,16 +1,15 @@
 @import "tailwindcss";
-@import "./palettes.css";
 
 @theme {
-  --color-bg: #1a1a2e;
-  --color-surface: #242442;
-  --color-surface-hover: #2e2e52;
-  --color-text: #e0e0e8;
-  --color-text-muted: #9090a8;
-  --color-primary: #6c63ff;
-  --color-primary-hover: #5a52e0;
-  --color-accent: #f0ad4e;
-  --color-error: #e05555;
+  --color-bg: #343434;
+  --color-surface: #5b6264;
+  --color-surface-hover: #6d7476;
+  --color-text: #eae8e5;
+  --color-text-muted: #cecece;
+  --color-primary: #ff8935;
+  --color-primary-hover: #e07528;
+  --color-accent: #f4a638;
+  --color-error: #d43030;
   --breakpoint-md: 800px;
   --color-border: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
   --color-border-light: color-mix(in srgb, var(--color-text-muted) 20%, transparent);
@@ -38,4 +37,18 @@ body {
   color-scheme: dark;
   min-height: 100vh;
   padding: 1rem;
+}
+
+/* Light mode overrides — toggled via data-mode="light" on <html> */
+[data-mode="light"] {
+  --color-bg: #eae8e5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #dddbd8;
+  --color-text: #343434;
+  --color-text-muted: #5b6264;
+  --color-primary: #e07528;
+  --color-primary-hover: #c86820;
+  --color-accent: #d89420;
+  --color-error: #c83030;
+  color-scheme: light;
 }
