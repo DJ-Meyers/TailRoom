@@ -1,3 +1,4 @@
+import { MoveSelector } from '~/components/MoveSelector';
 import { Typeahead } from '~/components/Typeahead';
 import { STATUS_LABELS, STATUS_VALUES, TYPE_NAMES } from '~/constants';
 import type { PokemonState, StatKey } from '~/types';
@@ -15,6 +16,8 @@ interface Props {
   state: PokemonState;
   idPrefix: string;
   showCrit: boolean;
+  move?: string;
+  onMoveChange?: (move: string) => void;
   onUpdate: (patch: Partial<PokemonState>) => void;
   onBoostChange: (stat: StatKey, value: number) => void;
 }
@@ -23,11 +26,23 @@ export const TargetModifierInputs = ({
   state,
   idPrefix,
   showCrit,
+  move,
+  onMoveChange,
   onUpdate,
   onBoostChange,
 }: Props) => (
-  <div className="py-2 mb-2 border-b border-border-section">
+  <div className="pt-2">
     <div className="flex flex-wrap items-end gap-2 mb-2">
+      {move !== undefined && onMoveChange && (
+        <div className="min-w-[120px] flex-1 basis-[120px]">
+          <MoveSelector
+            id={`${idPrefix}-tm-move`}
+            value={move}
+            onChange={onMoveChange}
+            className="!mb-0"
+          />
+        </div>
+      )}
       <div className="min-w-[120px] flex-1 basis-[120px]">
         <Typeahead
           id={`${idPrefix}-tm-tera`}

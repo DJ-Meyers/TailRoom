@@ -1,6 +1,6 @@
 import type { FieldConditions } from '~/types';
 
-const WEATHER_OPTIONS: FieldConditions['weather'][] = ['Sun', 'Rain', 'Sand', 'Snow', 'Hail'];
+const WEATHER_OPTIONS: FieldConditions['weather'][] = ['Sun', 'Rain', 'Sand', 'Snow'];
 const TERRAIN_OPTIONS: FieldConditions['terrain'][] = ['Electric', 'Grassy', 'Psychic', 'Misty'];
 
 interface Props {
@@ -33,7 +33,7 @@ export const FieldConditionInputs = ({ field, idPrefix, onChange }: Props) => {
   };
 
   return (
-    <div className="pt-2 mt-2 border-t border-border-section flex flex-col gap-1.5">
+    <div className="py-2 my-2 border-y border-border-section flex flex-col gap-1.5">
       <div className="flex flex-wrap gap-2">
         <div className="flex flex-col min-w-[100px]">
           <label htmlFor={`${idPrefix}-weather`} className="text-[0.7rem] font-semibold text-text-dim mb-0.5">Weather</label>
