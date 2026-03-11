@@ -10,6 +10,13 @@ export interface DamageCalcResult {
   defenderMaxHp: number;
 }
 
+const shouldActivateAbility = (pokemon: PokemonState, field: FieldConditions): boolean => {
+  if (pokemon.abilityOn) return true;
+  if (pokemon.ability === 'Protosynthesis' && (field.weather === 'Sun' || pokemon.item === 'Booster Energy')) return true;
+  if (pokemon.ability === 'Quark Drive' && (field.terrain === 'Electric' || pokemon.item === 'Booster Energy')) return true;
+  return false;
+};
+
 export const computeDamage = (
   attacker: PokemonState,
   defender: PokemonState,
@@ -21,6 +28,9 @@ export const computeDamage = (
     if (!gen.species.get(toID(defender.species))) return null;
     if (!gen.moves.get(toID(moveName))) return null;
 
+    const atkAbilityOn = shouldActivateAbility(attacker, field);
+    const defAbilityOn = shouldActivateAbility(defender, field);
+
     const atkPoke = new Pokemon(gen, attacker.species, {
       level: attacker.level,
       nature: attacker.nature,
@@ -31,8 +41,8 @@ export const computeDamage = (
       teraType: (attacker.teraType || undefined) as any,
       boosts: attacker.boosts,
       status: (attacker.status || undefined) as any,
-      abilityOn: attacker.abilityOn || undefined,
-      boostedStat: (attacker.boostedStat || undefined) as any,
+      abilityOn: atkAbilityOn || undefined,
+      boostedStat: (atkAbilityOn ? attacker.boostedStat || 'auto' : undefined) as any,
     });
 
     const defPoke = new Pokemon(gen, defender.species, {
@@ -45,8 +55,8 @@ export const computeDamage = (
       teraType: (defender.teraType || undefined) as any,
       boosts: defender.boosts,
       status: (defender.status || undefined) as any,
-      abilityOn: defender.abilityOn || undefined,
-      boostedStat: (defender.boostedStat || undefined) as any,
+      abilityOn: defAbilityOn || undefined,
+      boostedStat: (defAbilityOn ? defender.boostedStat || 'auto' : undefined) as any,
     });
 
     const move = new Move(gen, moveName, {
