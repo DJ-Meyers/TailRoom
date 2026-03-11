@@ -52,11 +52,49 @@ const INITIAL_OFFENSIVE_ENTRIES: CalcEntry[] = [
   },
 ];
 
+const INITIAL_DEFENSIVE_ENTRIES: CalcEntry[] = [
+  {
+    id: 'def-default-1',
+    move: 'Sucker Punch',
+    opponent: createDefaultPokemonState('Chien-Pao', '', {
+      nature: 'Adamant',
+      evs: { ...defaultEvs(), atk: 252 },
+    }),
+    fieldConditions: { isSwordOfRuin: true },
+    selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
+    isExpanded: false,
+  },
+  {
+    id: 'def-default-2',
+    move: 'Surging Strikes',
+    opponent: createDefaultPokemonState('Urshifu-Rapid-Strike', '', {
+      nature: 'Adamant',
+      evs: { ...defaultEvs(), atk: 188 },
+      item: 'Mystic Water',
+      isCrit: true,
+    }),
+    fieldConditions: {},
+    selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
+    isExpanded: false,
+  },
+  {
+    id: 'def-default-3',
+    move: 'Blizzard',
+    opponent: createDefaultPokemonState('Ninetales-Alola', '', {
+      nature: 'Timid',
+      evs: defaultEvs(),
+    }),
+    fieldConditions: { weather: 'Snow' },
+    selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
+    isExpanded: false,
+  },
+];
+
 export const MultiCalcView = () => {
   const initialOverrides = useMemo(() => INITIAL_OVERRIDES, []);
   const selectedPokemon = usePokemon('Flutter Mane', '', initialOverrides);
   const offensive = useMultiCalc(INITIAL_OFFENSIVE_ENTRIES);
-  const defensive = useMultiCalc();
+  const defensive = useMultiCalc(INITIAL_DEFENSIVE_ENTRIES);
 
   const handleSelectedPokemonParsed = useCallback((parsed: ParseResult) => {
     selectedPokemon.applyParsed(parsed);
