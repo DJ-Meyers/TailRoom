@@ -41,7 +41,7 @@ export const KO_TIER_LABELS_DEFENSIVE: Record<KoTier, string> = {
   5: 'No result',
 };
 
-const shouldActivateAbility = (pokemon: PokemonState, field: FieldConditions): boolean => {
+export const shouldActivateAbility = (pokemon: PokemonState, field: FieldConditions): boolean => {
   if (pokemon.abilityOn) return true;
   if (pokemon.ability === 'Protosynthesis' && (field.weather === 'Sun' || pokemon.item === 'Booster Energy')) return true;
   if (pokemon.ability === 'Quark Drive' && (field.terrain === 'Electric' || pokemon.item === 'Booster Energy')) return true;
