@@ -106,7 +106,7 @@ export const MultiCalcView = () => {
         <PokemonPanel
           label="Your Pokemon"
           state={selectedPokemon.state}
-          abilities={selectedPokemon.abilities}
+          speciesAbilities={selectedPokemon.abilities}
           showMove={false}
           hideModifiers
           onSpeciesChange={selectedPokemon.setSpecies}
