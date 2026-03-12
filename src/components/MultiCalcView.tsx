@@ -2,8 +2,11 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { CalcColumn } from '~/components/CalcColumn';
 import { PokemonPanel } from '~/components/PokemonPanel';
+import { SpeedColumn } from '~/components/SpeedColumn';
+import { DEFAULT_SPEED_ENTRIES } from '~/data/defaultSpeedEntries';
 import { useMultiCalc } from '~/hooks/useMultiCalc';
 import { usePokemon } from '~/hooks/usePokemon';
+import { useSpeedCalc } from '~/hooks/useSpeedCalc';
 import type { CalcEntry, ParseResult, PokemonState } from '~/types';
 import { createDefaultPokemonState, defaultBoosts, defaultEvs, defaultIvs, defaultSelectedPokemonModifiers } from '~/utils/pokemonState';
 
@@ -110,6 +113,7 @@ export const MultiCalcView = () => {
   const selectedPokemon = usePokemon('Incineroar', '', initialOverrides);
   const offensive = useMultiCalc(INITIAL_OFFENSIVE_ENTRIES);
   const defensive = useMultiCalc(INITIAL_DEFENSIVE_ENTRIES);
+  const speed = useSpeedCalc(DEFAULT_SPEED_ENTRIES);
   const [selectedName, setSelectedName] = useState('');
   const [selectedNotes, setSelectedNotes] = useState('');
 
@@ -118,8 +122,12 @@ export const MultiCalcView = () => {
   }, [selectedPokemon]);
 
   return (
-    <div>
-      <div className="max-w-[600px] mx-auto mb-6">
+    <div
+      className="grid grid-cols-2 gap-4 h-[calc(100vh-6rem)] max-md:flex max-md:flex-col max-md:h-auto"
+      style={{ gridTemplateRows: 'minmax(auto, 1fr) minmax(0, 1fr)' }}
+    >
+      {/* Top Left: Your Pokemon */}
+      <div>
         <PokemonPanel
           label="Your Pokemon"
           state={selectedPokemon.state}
@@ -144,7 +152,29 @@ export const MultiCalcView = () => {
           onParsed={handleSelectedPokemonParsed}
         />
       </div>
-      <div className="flex gap-6 items-start max-md:flex-col">
+
+      {/* Top Right: Speed Calcs */}
+      <div className="overflow-y-auto min-h-0">
+        <SpeedColumn
+          entries={speed.entries}
+          selectedPokemon={selectedPokemon.state}
+          conditions={speed.conditions}
+          onConditionsChange={speed.setConditions}
+          onAdd={speed.add}
+          onRemove={speed.remove}
+          onToggleExpanded={speed.toggleExpanded}
+          onSpeciesChange={speed.setSpecies}
+          onPokemonUpdate={speed.updatePokemon}
+          onEvChange={speed.setEv}
+          onIvChange={speed.setIv}
+          onBoostChange={speed.setBoost}
+          onNameChange={speed.updateName}
+          onNotesChange={speed.updateNotes}
+        />
+      </div>
+
+      {/* Bottom Left: Offensive Calcs */}
+      <div className="overflow-y-auto min-h-0">
         <CalcColumn
           title="Offensive Calcs"
           mode="offensive"
@@ -165,6 +195,10 @@ export const MultiCalcView = () => {
           onNameChange={offensive.updateName}
           onNotesChange={offensive.updateNotes}
         />
+      </div>
+
+      {/* Bottom Right: Defensive Calcs */}
+      <div className="overflow-y-auto min-h-0">
         <CalcColumn
           title="Defensive Calcs"
           mode="defensive"

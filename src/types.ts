@@ -85,6 +85,23 @@ export interface CalcEntry {
   isExpanded: boolean;
 }
 
+export interface SpeedEntry {
+  id: string;
+  name: string;
+  notes: string;
+  pokemon: PokemonState;
+  isExpanded: boolean;
+}
+
+export interface SpeedConditions {
+  yourTailwind: boolean;
+  enemyTailwind: boolean;
+  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow';
+  terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
+}
+
+export type SpeedTier = 'faster' | 'tie' | 'slower';
+
 export const STAT_KEYS: StatKey[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 
 export const STAT_LABELS: Record<StatKey, string> = {

@@ -1,0 +1,162 @@
+import type { SpeedEntry } from '~/types';
+import { createDefaultPokemonState, defaultEvs, defaultIvs } from '~/utils/pokemonState';
+
+export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
+  {
+    id: 'spd-1',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Flutter Mane', '', {
+      nature: 'Timid',
+      ability: 'Protosynthesis',
+      item: 'Booster Energy',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-2',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Tornadus', '', {
+      nature: 'Timid',
+      ability: 'Prankster',
+      item: 'Focus Sash',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-3',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Raging Bolt', '', {
+      nature: 'Modest',
+      ability: 'Protosynthesis',
+      item: 'Booster Energy',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-4',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Chien-Pao', '', {
+      nature: 'Jolly',
+      ability: 'Sword of Ruin',
+      item: 'Focus Sash',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-5',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Urshifu-Rapid-Strike', '', {
+      nature: 'Jolly',
+      ability: 'Unseen Fist',
+      item: 'Choice Scarf',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-6',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Ogerpon-Wellspring', '', {
+      nature: 'Jolly',
+      ability: 'Water Absorb',
+      item: 'Wellspring Mask',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-7',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Incineroar', '', {
+      nature: 'Careful',
+      ability: 'Intimidate',
+      item: 'Safety Goggles',
+      evs: { ...defaultEvs(), spe: 4 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-8',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Iron Hands', '', {
+      nature: 'Adamant',
+      ability: 'Quark Drive',
+      item: 'Assault Vest',
+      evs: { ...defaultEvs(), spe: 4 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-9',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Rillaboom', '', {
+      nature: 'Adamant',
+      ability: 'Grassy Surge',
+      item: 'Assault Vest',
+      evs: { ...defaultEvs(), spe: 4 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-10',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Amoonguss', '', {
+      nature: 'Relaxed',
+      ability: 'Regenerator',
+      item: 'Rocky Helmet',
+      evs: defaultEvs(),
+      ivs: { ...defaultIvs(), spe: 0 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-12',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Kingambit', '', {
+      nature: 'Adamant',
+      ability: 'Defiant',
+      item: 'Assault Vest',
+      evs: defaultEvs(),
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-13',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Landorus-Therian', '', {
+      nature: 'Adamant',
+      ability: 'Intimidate',
+      item: 'Choice Scarf',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+  {
+    id: 'spd-14',
+    name: '',
+    notes: '',
+    pokemon: createDefaultPokemonState('Farigiraf', '', {
+      nature: 'Bold',
+      ability: 'Armor Tail',
+      item: 'Sitrus Berry',
+      evs: { ...defaultEvs(), spe: 252 },
+    }),
+    isExpanded: false,
+  },
+];
