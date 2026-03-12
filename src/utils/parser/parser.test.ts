@@ -704,6 +704,44 @@ describe('parseInput', () => {
       });
     });
   });
+
+  // --- Speed context ---
+
+  describe('speed parse context', () => {
+    it('"252+ Rillaboom" resolves to 252 Spe EVs and Jolly nature', () => {
+      const r = parseInput('252+ Rillaboom', { role: 'speed' });
+      expect(r.species).toBe('Rillaboom');
+      expect(r.evs?.spe).toBe(252);
+      expect(r.nature).toBe('Jolly');
+    });
+
+    it('"252+ Tornadus" resolves to 252 Spe EVs and Jolly nature', () => {
+      const r = parseInput('252+ Tornadus', { role: 'speed' });
+      expect(r.species).toBe('Tornadus');
+      expect(r.evs?.spe).toBe(252);
+      expect(r.nature).toBe('Jolly');
+    });
+
+    it('"max+ Flutter Mane" resolves to 252 Spe EVs and Jolly nature', () => {
+      const r = parseInput('max+ Flutter Mane', { role: 'speed' });
+      expect(r.species).toBe('Flutter Mane');
+      expect(r.evs?.spe).toBe(252);
+      expect(r.nature).toBe('Jolly');
+    });
+
+    it('explicit stat still works: "252+ Atk Rillaboom"', () => {
+      const r = parseInput('252+ Atk Rillaboom', { role: 'speed' });
+      expect(r.evs?.atk).toBe(252);
+      expect(r.nature).toBe('Adamant');
+      expect(r.evs?.spe).toBeUndefined();
+    });
+
+    it('explicit nature overrides deferred speed nature', () => {
+      const r = parseInput('Timid 252+ Rillaboom', { role: 'speed' });
+      expect(r.evs?.spe).toBe(252);
+      expect(r.nature).toBe('Timid');
+    });
+  });
 });
 
 describe('parseModifiers', () => {

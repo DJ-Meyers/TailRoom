@@ -65,7 +65,7 @@ const getDefensiveStat = (moveName: string): StatKey | undefined => {
 };
 
 export interface ParseContext {
-  role?: 'attacker' | 'defender';
+  role?: 'attacker' | 'defender' | 'speed';
   /** The attacker's move (used by defender to resolve deferred stat patterns). */
   opposingMove?: string;
 }
@@ -490,7 +490,10 @@ export const parseInput = (input: string, context?: ParseContext): ParseResult =
   // Resolve deferred patterns that depend on the relevant stat
   if (deferredMaxPlus || deferredBoost !== null) {
     let targetStat: StatKey | undefined;
-    if (context?.role === 'defender' && context.opposingMove) {
+    if (context?.role === 'speed') {
+      // Speed context: "252+" always means speed
+      targetStat = 'spe';
+    } else if (context?.role === 'defender' && context.opposingMove) {
       // Defender: resolve to the defensive stat that tanks the incoming move
       targetStat = getDefensiveStat(context.opposingMove);
     } else if (result.move) {
