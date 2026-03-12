@@ -76,6 +76,8 @@ export interface SelectedPokemonModifiers {
 
 export interface CalcEntry {
   id: string;
+  name: string;
+  notes: string;
   opponent: PokemonState;
   move: string;
   fieldConditions: FieldConditions;

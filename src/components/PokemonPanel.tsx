@@ -31,6 +31,10 @@ interface Props {
   onIsCritChange: (isCrit: boolean) => void;
   onParsed: (result: ParseResult) => void;
   parseContext?: ParseContext;
+  name?: string;
+  notes?: string;
+  onNameChange?: (name: string) => void;
+  onNotesChange?: (notes: string) => void;
 }
 
 export const PokemonPanel = ({
@@ -53,11 +57,35 @@ export const PokemonPanel = ({
   onIsCritChange,
   onParsed,
   parseContext,
+  name,
+  notes,
+  onNameChange,
+  onNotesChange,
 }: Props) => {
   const id = label.toLowerCase();
   return (
     <div className={compact ? 'flex-1' : 'flex-1 bg-surface rounded-lg p-5 shadow-md'}>
       {!compact && <h2 className="text-center mb-4 text-lg text-text-heading">{label}</h2>}
+      {onNameChange && (
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            placeholder="Name (e.g. Standard Ursh)"
+            value={name ?? ''}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="flex-1 min-w-0 px-2 py-1 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint"
+          />
+        </div>
+      )}
+      {onNotesChange && (
+        <textarea
+          placeholder="Notes..."
+          value={notes ?? ''}
+          onChange={(e) => onNotesChange(e.target.value)}
+          rows={2}
+          className="w-full px-2 py-1 mb-3 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint resize-y"
+        />
+      )}
       <ParseInput onParsed={onParsed} label={id} parseContext={parseContext} />
       <div className="flex gap-4 max-md:flex-col">
         <div className="flex-1 min-w-0">

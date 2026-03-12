@@ -63,7 +63,8 @@ export const useCalcListView = (
       return (
         opponent.species.toLowerCase().includes(q) ||
         e.entry.move.toLowerCase().includes(q) ||
-        opponent.item.toLowerCase().includes(q)
+        opponent.item.toLowerCase().includes(q) ||
+        e.entry.name.toLowerCase().includes(q)
       );
     });
   }, [enriched, searchQuery]);

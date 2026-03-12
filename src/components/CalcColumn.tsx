@@ -21,6 +21,8 @@ interface Props {
   onFieldChange: (id: string, field: FieldConditions) => void;
   onSelectedPokemonModifiersUpdate: (id: string, patch: Partial<SelectedPokemonModifiers>) => void;
   onSelectedPokemonBoostChange: (id: string, stat: StatKey, value: number) => void;
+  onNameChange: (id: string, name: string) => void;
+  onNotesChange: (id: string, notes: string) => void;
 }
 
 export const CalcColumn = ({
@@ -40,6 +42,8 @@ export const CalcColumn = ({
   onFieldChange,
   onSelectedPokemonModifiersUpdate,
   onSelectedPokemonBoostChange,
+  onNameChange,
+  onNotesChange,
 }: Props) => {
   const { groups, viewState, setSortBy, setGroupBy, setSearchQuery } = useCalcListView(
     entries,
@@ -49,7 +53,8 @@ export const CalcColumn = ({
 
   return (
     <div className="flex-1 min-w-0">
-      <h3 className="text-base text-text-heading mb-3 pb-2 border-b-2 border-primary">{title}</h3>
+      <h3 className="sticky top-0 z-10 bg-bg text-base text-text-heading mb-3 pb-2 border-b-2 border-primary">{title}</h3>
+      <AddCalcInput mode={mode} onAdd={onAdd} />
       <CalcListControls
         viewState={viewState}
         onSortChange={setSortBy}
@@ -81,11 +86,12 @@ export const CalcColumn = ({
               onFieldChange={(field) => onFieldChange(entry.id, field)}
               onSelectedPokemonModifiersUpdate={(patch) => onSelectedPokemonModifiersUpdate(entry.id, patch)}
               onSelectedPokemonBoostChange={(stat, value) => onSelectedPokemonBoostChange(entry.id, stat, value)}
+              onNameChange={(name) => onNameChange(entry.id, name)}
+              onNotesChange={(notes) => onNotesChange(entry.id, notes)}
             />
           ))}
         </div>
       ))}
-      <AddCalcInput mode={mode} onAdd={onAdd} />
     </div>
   );
 };

@@ -1,21 +1,25 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { CalcColumn } from '~/components/CalcColumn';
 import { PokemonPanel } from '~/components/PokemonPanel';
 import { useMultiCalc } from '~/hooks/useMultiCalc';
 import { usePokemon } from '~/hooks/usePokemon';
 import type { CalcEntry, ParseResult, PokemonState } from '~/types';
-import { createDefaultPokemonState, defaultBoosts, defaultEvs, defaultSelectedPokemonModifiers } from '~/utils/pokemonState';
+import { createDefaultPokemonState, defaultBoosts, defaultEvs, defaultIvs, defaultSelectedPokemonModifiers } from '~/utils/pokemonState';
 
 const INITIAL_OVERRIDES: Partial<PokemonState> = {
-  nature: 'Timid',
-  item: 'Choice Specs',
-  evs: { ...defaultEvs(), spa: 252 },
+  nature: 'Careful',
+  ability: 'Intimidate',
+  item: 'Safety Goggles',
+  evs: { ...defaultEvs(), hp: 252, def: 124, spd: 132 },
+  ivs: { ...defaultIvs(), spe: 29, spa: 15 },
 };
 
 const INITIAL_OFFENSIVE_ENTRIES: CalcEntry[] = [
   {
     id: 'default-1',
+    name: '',
+    notes: '',
     move: 'Dazzling Gleam',
     opponent: createDefaultPokemonState('Incineroar', '', {
       nature: 'Impish',
@@ -31,6 +35,8 @@ const INITIAL_OFFENSIVE_ENTRIES: CalcEntry[] = [
   },
   {
     id: 'default-2',
+    name: '',
+    notes: '',
     move: 'Moonblast',
     opponent: createDefaultPokemonState('Dondozo', '', {
       evs: { ...defaultEvs(), hp: 4, spd: 76 },
@@ -42,6 +48,8 @@ const INITIAL_OFFENSIVE_ENTRIES: CalcEntry[] = [
   },
   {
     id: 'default-3',
+    name: '',
+    notes: '',
     move: 'Shadow Ball',
     opponent: createDefaultPokemonState('Gholdengo', '', {
       evs: { ...defaultEvs(), hp: 4 },
@@ -55,6 +63,8 @@ const INITIAL_OFFENSIVE_ENTRIES: CalcEntry[] = [
 const INITIAL_DEFENSIVE_ENTRIES: CalcEntry[] = [
   {
     id: 'def-default-1',
+    name: '',
+    notes: '',
     move: 'Sucker Punch',
     opponent: createDefaultPokemonState('Chien-Pao', '', {
       nature: 'Adamant',
@@ -66,19 +76,24 @@ const INITIAL_DEFENSIVE_ENTRIES: CalcEntry[] = [
   },
   {
     id: 'def-default-2',
+    name: '',
+    notes: '',
     move: 'Surging Strikes',
     opponent: createDefaultPokemonState('Urshifu-Rapid-Strike', '', {
       nature: 'Adamant',
       evs: { ...defaultEvs(), atk: 188 },
       item: 'Mystic Water',
+      teraType: 'Water',
       isCrit: true,
     }),
-    fieldConditions: {},
+    fieldConditions: { weather: 'Rain' },
     selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
     isExpanded: false,
   },
   {
     id: 'def-default-3',
+    name: '',
+    notes: '',
     move: 'Blizzard',
     opponent: createDefaultPokemonState('Ninetales-Alola', '', {
       nature: 'Timid',
@@ -92,9 +107,11 @@ const INITIAL_DEFENSIVE_ENTRIES: CalcEntry[] = [
 
 export const MultiCalcView = () => {
   const initialOverrides = useMemo(() => INITIAL_OVERRIDES, []);
-  const selectedPokemon = usePokemon('Flutter Mane', '', initialOverrides);
+  const selectedPokemon = usePokemon('Incineroar', '', initialOverrides);
   const offensive = useMultiCalc(INITIAL_OFFENSIVE_ENTRIES);
   const defensive = useMultiCalc(INITIAL_DEFENSIVE_ENTRIES);
+  const [selectedName, setSelectedName] = useState('');
+  const [selectedNotes, setSelectedNotes] = useState('');
 
   const handleSelectedPokemonParsed = useCallback((parsed: ParseResult) => {
     selectedPokemon.applyParsed(parsed);
@@ -109,6 +126,10 @@ export const MultiCalcView = () => {
           speciesAbilities={selectedPokemon.abilities}
           showMove={false}
           hideModifiers
+          name={selectedName}
+          notes={selectedNotes}
+          onNameChange={setSelectedName}
+          onNotesChange={setSelectedNotes}
           onSpeciesChange={selectedPokemon.setSpecies}
           onNatureChange={selectedPokemon.setNature}
           onAbilityChange={selectedPokemon.setAbility}
@@ -141,6 +162,8 @@ export const MultiCalcView = () => {
           onFieldChange={offensive.updateField}
           onSelectedPokemonModifiersUpdate={offensive.updateSelectedPokemonModifiers}
           onSelectedPokemonBoostChange={offensive.setSelectedPokemonBoost}
+          onNameChange={offensive.updateName}
+          onNotesChange={offensive.updateNotes}
         />
         <CalcColumn
           title="Defensive Calcs"
@@ -159,6 +182,8 @@ export const MultiCalcView = () => {
           onFieldChange={defensive.updateField}
           onSelectedPokemonModifiersUpdate={defensive.updateSelectedPokemonModifiers}
           onSelectedPokemonBoostChange={defensive.setSelectedPokemonBoost}
+          onNameChange={defensive.updateName}
+          onNotesChange={defensive.updateNotes}
         />
       </div>
     </div>

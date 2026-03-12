@@ -16,7 +16,9 @@ type Action =
   | { type: 'UPDATE_MOVE'; id: string; move: string }
   | { type: 'UPDATE_FIELD'; id: string; field: FieldConditions }
   | { type: 'UPDATE_SELECTED_POKEMON_MODIFIERS'; id: string; patch: Partial<SelectedPokemonModifiers> }
-  | { type: 'SET_SELECTED_POKEMON_BOOST'; id: string; stat: StatKey; value: number };
+  | { type: 'SET_SELECTED_POKEMON_BOOST'; id: string; stat: StatKey; value: number }
+  | { type: 'UPDATE_NAME'; id: string; name: string }
+  | { type: 'UPDATE_NOTES'; id: string; notes: string };
 
 const reducer = (state: CalcEntry[], action: Action): CalcEntry[] => {
   switch (action.type) {
@@ -132,6 +134,16 @@ const reducer = (state: CalcEntry[], action: Action): CalcEntry[] => {
           : e,
       );
 
+    case 'UPDATE_NAME':
+      return state.map((e) =>
+        e.id === action.id ? { ...e, name: action.name } : e,
+      );
+
+    case 'UPDATE_NOTES':
+      return state.map((e) =>
+        e.id === action.id ? { ...e, notes: action.notes } : e,
+      );
+
     default:
       return state;
   }
@@ -191,6 +203,14 @@ export const useMultiCalc = (initialEntries: CalcEntry[] = []) => {
     dispatch({ type: 'SET_SELECTED_POKEMON_BOOST', id, stat, value });
   }, []);
 
+  const updateName = useCallback((id: string, name: string) => {
+    dispatch({ type: 'UPDATE_NAME', id, name });
+  }, []);
+
+  const updateNotes = useCallback((id: string, notes: string) => {
+    dispatch({ type: 'UPDATE_NOTES', id, notes });
+  }, []);
+
   return {
     entries,
     add,
@@ -205,5 +225,7 @@ export const useMultiCalc = (initialEntries: CalcEntry[] = []) => {
     updateField,
     updateSelectedPokemonModifiers,
     setSelectedPokemonBoost,
+    updateName,
+    updateNotes,
   };
 };
