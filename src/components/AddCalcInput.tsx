@@ -37,7 +37,22 @@ export const AddCalcInput = ({ mode, onAdd }: Props) => {
 
   const handleSubmit = useCallback(() => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+
+    if (!trimmed) {
+      onAdd({
+        name: '',
+        notes: '',
+        opponent: applyParsedToState(
+          createDefaultPokemonState('Incineroar', ''),
+          { unmatched: [] },
+        ),
+        move: '',
+        fieldConditions: {},
+        selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
+        isExpanded: false,
+      });
+      return;
+    }
 
     if (mode === 'offensive') {
       const parts = trimmed.split(/\s+vs\s+/i);
@@ -56,6 +71,8 @@ export const AddCalcInput = ({ mode, onAdd }: Props) => {
         defenderParsed.fieldConditions ?? {},
       );
       onAdd({
+        name: '',
+        notes: '',
         opponent: defenderState,
         move,
         fieldConditions,
@@ -70,6 +87,8 @@ export const AddCalcInput = ({ mode, onAdd }: Props) => {
         result,
       );
       onAdd({
+        name: '',
+        notes: '',
         opponent: attackerState,
         move,
         fieldConditions: result.fieldConditions ?? {},
@@ -86,7 +105,7 @@ export const AddCalcInput = ({ mode, onAdd }: Props) => {
     : 'e.g. Adamant Max Attack Chien-Pao Sucker Punch';
 
   return (
-    <div className="flex gap-1.5 mt-2">
+    <div className="flex gap-1.5 mb-2">
       <input
         type="text"
         value={text}

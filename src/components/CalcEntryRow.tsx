@@ -30,6 +30,8 @@ interface Props {
   onFieldChange: (field: FieldConditions) => void;
   onSelectedPokemonModifiersUpdate: (patch: Partial<SelectedPokemonModifiers>) => void;
   onSelectedPokemonBoostChange: (stat: StatKey, value: number) => void;
+  onNameChange: (name: string) => void;
+  onNotesChange: (notes: string) => void;
 }
 
 const STATUS_SUMMARY: Record<string, string> = {
@@ -70,8 +72,8 @@ const formatSummary = (
   fieldConditions: FieldConditions,
 ): ReactNode => {
   if (!result) {
-    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{moveName} <PokemonIcon species={defender.species} /><ItemIcon item={defender.item} /></>;
-    return <><WeatherIcon weather={fieldConditions.weather} /><PokemonIcon species={attacker.species} /><ItemIcon item={attacker.item} /> {moveName}</>;
+    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{moveName} {defender.teraType && <TypeIcon typeName={defender.teraType} />}<ItemIcon item={defender.item} /><PokemonIcon species={defender.species} /></>;
+    return <><WeatherIcon weather={fieldConditions.weather} />{attacker.teraType && <TypeIcon typeName={attacker.teraType} />}<ItemIcon item={attacker.item} /><PokemonIcon species={attacker.species} /> {moveName}</>;
   }
 
   const pct = (val: number) => ((val / defenderMaxHp) * 100).toFixed(1);
@@ -86,9 +88,10 @@ const formatSummary = (
   const defStat: StatKey = isSpecial ? 'spd' : 'def';
 
   // Attacker modifiers: tera type, stat boost, status, crit
+  const atkTeraIcon = attacker.teraType ? <TypeIcon key="atk-tera" typeName={attacker.teraType} /> : null;
   const atkMods: ReactNode[] = [];
-  if (attacker.teraType) {
-    atkMods.push(<TypeIcon key="atk-tera" typeName={attacker.teraType} />);
+  if (atkTeraIcon && mode === 'offensive') {
+    atkMods.push(atkTeraIcon);
   }
   const atkBoost = attacker.boosts[atkStat];
   if (atkBoost !== 0) {
@@ -117,7 +120,7 @@ const formatSummary = (
   const defEVs = defender.evs[defStat];
   const defBoost = defender.boosts[defStat];
   const defBoostStr = defBoost !== 0 ? `${defBoost > 0 ? '+' : ''}${defBoost} ` : '';
-  const defTera = defender.teraType ? <><TypeIcon typeName={defender.teraType} />{' '}</> : null;
+  const defTera = defender.teraType ? <TypeIcon typeName={defender.teraType} /> : null;
   const defDesc = `${defBoostStr}${hpEVs}/${defEVs}${natureSign} ${DEF_STAT_LABEL[defStat]}`;
 
   const iconClass = "shrink-0 relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle";
@@ -129,18 +132,20 @@ const formatSummary = (
       {weatherIcon}
       <span className="shrink-0">{atkPrefix}{moveName}</span>
       <span className="shrink-0 text-text-faint">vs</span>
+      {defTera}<ItemIcon item={defender.item} />
       <PokemonIcon species={defender.species} className={iconClass} />
       <span className="min-w-0">
-        <div className="truncate">{defDesc} {defTera}<ItemIcon item={defender.item} /></div>
+        <div className="truncate">{defDesc}</div>
         <div className={`text-xs truncate ${koColor}`}>{range}{ko}</div>
       </span>
     </span>;
   }
   return <span className="flex items-center gap-1 min-w-0">
     {weatherIcon}
+    {atkTeraIcon}<ItemIcon item={attacker.item} />
     <PokemonIcon species={attacker.species} className={iconClass} />
     <span className="min-w-0">
-      <div className="truncate"><ItemIcon item={attacker.item} /> {atkPrefix}{atkSpread} {moveName}</div>
+      <div className="truncate">{atkPrefix}{atkSpread} {moveName}</div>
       <div className={`text-xs truncate ${koColor}`}>{range}{ko}</div>
     </span>
   </span>;
@@ -162,6 +167,8 @@ export const CalcEntryRow = ({
   onFieldChange,
   onSelectedPokemonModifiersUpdate,
   onSelectedPokemonBoostChange,
+  onNameChange,
+  onNotesChange,
 }: Props) => {
   const selectedPokemonWithMods = useMemo(
     () => ({ ...selectedPokemon, ...entry.selectedPokemonModifiers }),
@@ -210,6 +217,7 @@ export const CalcEntryRow = ({
     <div className="bg-surface rounded-md mb-2 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none hover:bg-hover-bg" onClick={onToggleExpanded}>
         <span className="shrink-0 text-sm text-text-dim w-4">{entry.isExpanded ? '\u25BE' : '\u25B8'}</span>
+        {entry.name && <span className="shrink-0 text-sm font-semibold text-text-heading">{entry.name}</span>}
         <span className={`flex-1 text-sm min-w-0 ${result ? '' : 'text-text-dim italic'}`}>
           {summary}
         </span>
@@ -225,6 +233,24 @@ export const CalcEntryRow = ({
       </div>
       {entry.isExpanded && (
         <div className="p-3 border-t border-border-lighter bg-detail-bg">
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              placeholder="Name (e.g. Bulky BlUrsa)"
+              value={entry.name}
+              onChange={(e) => onNameChange(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 min-w-0 px-2 py-1 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint"
+            />
+          </div>
+          <textarea
+            placeholder="Notes..."
+            value={entry.notes}
+            onChange={(e) => onNotesChange(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            rows={2}
+            className="w-full px-2 py-1 mb-3 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint resize-y"
+          />
           {mode === 'defensive' ? (
             <>
               <div className="flex items-end gap-1 mb-1 leading-none">
