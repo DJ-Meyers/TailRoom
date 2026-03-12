@@ -14,7 +14,7 @@ import type { ParseContext } from '~/utils/parser';
 interface Props {
   label: string;
   state: PokemonState;
-  abilities: string[];
+  speciesAbilities: string[];
   showMove: boolean;
   hideModifiers?: boolean;
   compact?: boolean;
@@ -36,7 +36,7 @@ interface Props {
 export const PokemonPanel = ({
   label,
   state,
-  abilities,
+  speciesAbilities,
   showMove,
   hideModifiers,
   compact,
@@ -71,7 +71,7 @@ export const PokemonPanel = ({
             id={`${id}-ability`}
             value={state.ability}
             onChange={onAbilityChange}
-            abilities={abilities}
+            speciesAbilities={speciesAbilities}
           />
           <ItemSelector id={`${id}-item`} value={state.item} onChange={onItemChange} />
           {!hideModifiers && (

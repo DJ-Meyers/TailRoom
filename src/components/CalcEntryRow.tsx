@@ -266,7 +266,7 @@ export const CalcEntryRow = ({
           <PokemonPanel
             label={prefix}
             state={entry.opponent}
-            abilities={abilities}
+            speciesAbilities={abilities}
             showMove={mode === 'defensive'}
             hideModifiers
             compact
