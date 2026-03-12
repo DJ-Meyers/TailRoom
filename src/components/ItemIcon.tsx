@@ -1,19 +1,33 @@
-import { useState } from 'react';
+import { ITEM_SPRITE_NUM } from '~/data/itemSpriteNums';
 
-const toKebabCase = (name: string) =>
-  name.toLowerCase().replace(/'/g, '').replace(/ /g, '-');
+const SHEET_URL =
+  'https://play.pokemonshowdown.com/sprites/itemicons-sheet.png';
+const COLS = 16;
+/** Display size of each icon in em, matching the previous <img> sizing. */
+const ICON_EM = 1.3;
 
 export const ItemIcon = ({ item }: { item: string }) => {
-  const [failed, setFailed] = useState(false);
-  if (!item || failed) return null;
-  const src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${toKebabCase(item)}.png`;
+  if (!item) return null;
+  const num = ITEM_SPRITE_NUM[item];
+  if (num == null) return null;
+
+  const col = num % COLS;
+  const row = Math.floor(num / COLS);
+
   return (
-    <img
-      className="inline-block w-[1.3em] h-[1.3em] object-contain align-[-0.25em] mx-[0.1em]"
-      src={src}
-      alt={item}
+    <span
+      className="inline-block align-[-0.25em] mx-[0.1em]"
+      role="img"
+      aria-label={item}
       title={item}
-      onError={() => setFailed(true)}
+      style={{
+        width: `${ICON_EM}em`,
+        height: `${ICON_EM}em`,
+        background: `transparent url(${SHEET_URL}) no-repeat`,
+        backgroundPosition: `-${col * ICON_EM}em -${row * ICON_EM}em`,
+        backgroundSize: `${COLS * ICON_EM}em auto`,
+        imageRendering: 'auto',
+      }}
     />
   );
 };
