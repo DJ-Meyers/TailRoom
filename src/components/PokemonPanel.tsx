@@ -120,6 +120,9 @@ export const PokemonPanel = ({
         </div>
         <div className="shrink-0">
           <StatInputs
+            species={state.species}
+            level={state.level}
+            nature={state.nature}
             evs={state.evs}
             ivs={state.ivs}
             boosts={state.boosts}

@@ -1,7 +1,13 @@
+import { useMemo } from 'react';
+import { Pokemon } from '@smogon/calc';
+import { gen } from '~/data/gen';
 import type { StatKey, StatsTable } from '~/types';
 import { EV_STEP, MAX_EV_PER_STAT, MAX_TOTAL_EVS, STAT_KEYS, STAT_LABELS } from '~/types';
 
 interface Props {
+  species: string;
+  level: number;
+  nature: string;
   evs: StatsTable;
   ivs: StatsTable;
   boosts: StatsTable;
@@ -13,8 +19,17 @@ interface Props {
 
 const BOOSTABLE_STATS: StatKey[] = ['atk', 'def', 'spa', 'spd', 'spe'];
 
-export const StatInputs = ({ evs, ivs, boosts, hideBoosts, onEvChange, onIvChange, onBoostChange }: Props) => {
+export const StatInputs = ({ species, level, nature, evs, ivs, boosts, hideBoosts, onEvChange, onIvChange, onBoostChange }: Props) => {
   const totalEvs = STAT_KEYS.reduce((sum, key) => sum + evs[key], 0);
+
+  const rawStats = useMemo(() => {
+    try {
+      const poke = new Pokemon(gen, species, { level, nature, evs, ivs });
+      return poke.rawStats;
+    } catch {
+      return null;
+    }
+  }, [species, level, nature, evs, ivs]);
 
   return (
     <div className="flex flex-col h-full">
@@ -22,7 +37,7 @@ export const StatInputs = ({ evs, ivs, boosts, hideBoosts, onEvChange, onIvChang
         EVs: {totalEvs} / {MAX_TOTAL_EVS}
       </div>
       <div className="flex items-center gap-1.5 mb-1 text-[0.7rem] font-semibold text-text-dim">
-        <span className="w-8" />
+        <span className="w-16" />
         <span className="w-14 text-center">EV</span>
         <span className="w-12 text-center">IV</span>
         {!hideBoosts && <span className="w-14 text-center">Boost</span>}
@@ -31,7 +46,9 @@ export const StatInputs = ({ evs, ivs, boosts, hideBoosts, onEvChange, onIvChang
         const canBoost = BOOSTABLE_STATS.includes(stat);
         return (
           <div key={stat} className="flex items-center gap-1.5 mb-1 flex-1">
-            <span className="w-8 text-xs font-semibold text-text-label">{STAT_LABELS[stat]}</span>
+            <span className="w-16 text-xs font-semibold text-text-label">
+              {STAT_LABELS[stat]}{rawStats ? ` ${rawStats[stat]}` : ''}
+            </span>
             <input
               type="number"
               min={0}
