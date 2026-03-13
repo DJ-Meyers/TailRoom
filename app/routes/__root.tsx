@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { ClerkProvider } from '@clerk/tanstack-react-start'
 import { QueryClientProvider } from '@tanstack/react-query'
 import {
   HeadContent,
@@ -30,11 +31,17 @@ const RootComponent = () => {
 
   return (
     <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
-          <Outlet />
-        </TRPCProvider>
-      </QueryClientProvider>
+      <ClerkProvider
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        signInUrl="/sign-in"
+        signUpUrl="/sign-up"
+      >
+        <QueryClientProvider client={queryClient}>
+          <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+            <Outlet />
+          </TRPCProvider>
+        </QueryClientProvider>
+      </ClerkProvider>
     </RootDocument>
   )
 }
