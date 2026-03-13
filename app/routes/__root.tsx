@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react'
 
+import { QueryClientProvider } from '@tanstack/react-query'
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
-
 import appCss from '~/index.css?url'
+import { TRPCProvider } from '~/trpc/client'
+import { getTRPCClient } from '~/trpc/query-client'
+import { getQueryClient } from '~/trpc/query-client'
 
 const RootDocument = ({ children }: { children: ReactNode }) => (
   <html lang="en">
@@ -21,6 +24,21 @@ const RootDocument = ({ children }: { children: ReactNode }) => (
   </html>
 )
 
+const RootComponent = () => {
+  const queryClient = getQueryClient()
+  const trpcClient = getTRPCClient()
+
+  return (
+    <RootDocument>
+      <QueryClientProvider client={queryClient}>
+        <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+          <Outlet />
+        </TRPCProvider>
+      </QueryClientProvider>
+    </RootDocument>
+  )
+}
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -29,9 +47,5 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
-  component: () => (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  ),
+  component: RootComponent,
 })
