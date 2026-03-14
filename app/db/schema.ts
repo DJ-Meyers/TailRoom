@@ -4,6 +4,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -16,23 +17,24 @@ export const teams = pgTable(
     id: uuid().defaultRandom().primaryKey(),
     userId: text().notNull(),
     name: text().notNull(),
+    slug: text().notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true })
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [index('teams_user_id_idx').on(t.userId)],
+  (t) => [
+    index('teams_user_id_idx').on(t.userId),
+    unique('teams_user_id_slug_unique').on(t.userId, t.slug),
+  ],
 );
 
 export const pokemon = pgTable(
   'pokemon',
   {
     id: uuid().defaultRandom().primaryKey(),
-    teamId: uuid()
-      .notNull()
-      .references(() => teams.id, { onDelete: 'cascade' }),
-    slot: integer().notNull(),
+    userId: text().notNull(),
     name: text().notNull().default(''),
     notes: text().notNull().default(''),
     species: text().notNull().default(''),
@@ -55,13 +57,31 @@ export const pokemon = pgTable(
       .default({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }),
     isCrit: boolean().notNull().default(false),
     abilityOn: boolean().notNull().default(false),
+    slug: text().notNull().default(''),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true })
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [unique().on(t.teamId, t.slot)],
+  (t) => [index('pokemon_user_id_idx').on(t.userId)],
+);
+
+export const teamPokemon = pgTable(
+  'team_pokemon',
+  {
+    teamId: uuid()
+      .notNull()
+      .references(() => teams.id, { onDelete: 'cascade' }),
+    pokemonId: uuid()
+      .notNull()
+      .references(() => pokemon.id, { onDelete: 'cascade' }),
+    slot: integer().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.teamId, t.pokemonId] }),
+    unique('team_pokemon_team_slot_unique').on(t.teamId, t.slot),
+  ],
 );
 
 export const calcEntries = pgTable('calc_entries', {

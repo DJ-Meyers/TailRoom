@@ -1,11 +1,11 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { pokemon, teams } from '~/db/schema';
+import { pokemon, teamPokemon, teams } from '~/db/schema';
 import { statsTableSchema } from '~/db/zod';
 import { protectedProcedure, router } from '~/trpc/init';
 
-// Fields that can be updated on a pokemon (exclude id, teamId, slot, timestamps)
+// Fields that can be updated on a pokemon (exclude id, userId, timestamps)
 const updatePokemonInput = z.object({
   id: z.string().uuid(),
   name: z.string().optional(),
@@ -26,7 +26,46 @@ const updatePokemonInput = z.object({
   abilityOn: z.boolean().optional(),
 });
 
-// Helper: verify pokemon belongs to user via team ownership
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+async function uniquePokemonSlug(
+  db: typeof import('~/db').db,
+  userId: string,
+  name: string,
+  excludeId?: string,
+): Promise<string> {
+  const base = slugify(name) || 'pokemon';
+  let candidate = base;
+  let suffix = 2;
+
+  while (true) {
+    const conditions = [
+      eq(pokemon.userId, userId),
+      eq(pokemon.slug, candidate),
+    ];
+
+    const [existing] = await db
+      .select({ id: pokemon.id })
+      .from(pokemon)
+      .where(and(...conditions));
+
+    if (!existing || (excludeId && existing.id === excludeId)) {
+      return candidate;
+    }
+    candidate = `${base}-${suffix}`;
+    suffix++;
+  }
+}
+
+// Helper: verify pokemon belongs to user
 const verifyPokemonOwnership = async (
   db: typeof import('~/db').db,
   pokemonId: string,
@@ -35,8 +74,7 @@ const verifyPokemonOwnership = async (
   const [row] = await db
     .select({ id: pokemon.id })
     .from(pokemon)
-    .innerJoin(teams, eq(pokemon.teamId, teams.id))
-    .where(and(eq(pokemon.id, pokemonId), eq(teams.userId, userId)));
+    .where(and(eq(pokemon.id, pokemonId), eq(pokemon.userId, userId)));
   return !!row;
 };
 
@@ -47,10 +85,65 @@ export const pokemonRouter = router({
       const [row] = await ctx.db
         .select()
         .from(pokemon)
-        .innerJoin(teams, eq(pokemon.teamId, teams.id))
-        .where(and(eq(pokemon.id, input.id), eq(teams.userId, ctx.userId)));
-      return row?.pokemon ?? null;
+        .where(and(eq(pokemon.id, input.id), eq(pokemon.userId, ctx.userId)));
+      return row ?? null;
     }),
+
+  getBySlug: protectedProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const [row] = await ctx.db
+        .select()
+        .from(pokemon)
+        .where(
+          and(eq(pokemon.slug, input.slug), eq(pokemon.userId, ctx.userId)),
+        );
+      return row ?? null;
+    }),
+
+  listAll: protectedProcedure.query(async ({ ctx }) => {
+    // Get all pokemon for this user
+    const allPokemon = await ctx.db
+      .select()
+      .from(pokemon)
+      .where(eq(pokemon.userId, ctx.userId))
+      .orderBy(asc(pokemon.createdAt));
+
+    // Get team associations for these pokemon
+    const pokemonIds = allPokemon.map((p) => p.id);
+    const associations =
+      pokemonIds.length > 0
+        ? await ctx.db
+            .select({
+              pokemonId: teamPokemon.pokemonId,
+              teamName: teams.name,
+              teamSlug: teams.slug,
+            })
+            .from(teamPokemon)
+            .innerJoin(teams, eq(teamPokemon.teamId, teams.id))
+            .where(inArray(teamPokemon.pokemonId, pokemonIds))
+        : [];
+
+    // Group teams by pokemon
+    const teamsByPokemon = new Map<
+      string,
+      Array<{ teamName: string; teamSlug: string }>
+    >();
+    for (const assoc of associations) {
+      if (!teamsByPokemon.has(assoc.pokemonId)) {
+        teamsByPokemon.set(assoc.pokemonId, []);
+      }
+      teamsByPokemon.get(assoc.pokemonId)!.push({
+        teamName: assoc.teamName,
+        teamSlug: assoc.teamSlug,
+      });
+    }
+
+    return allPokemon.map((p) => ({
+      pokemon: p,
+      teams: teamsByPokemon.get(p.id) ?? [],
+    }));
+  }),
 
   listByTeam: protectedProcedure
     .input(z.object({ teamId: z.string().uuid() }))
@@ -65,38 +158,57 @@ export const pokemonRouter = router({
       if (!team) return [];
 
       return ctx.db
-        .select()
-        .from(pokemon)
-        .where(eq(pokemon.teamId, input.teamId))
-        .orderBy(asc(pokemon.slot));
+        .select({
+          pokemon,
+          slot: teamPokemon.slot,
+        })
+        .from(teamPokemon)
+        .innerJoin(pokemon, eq(teamPokemon.pokemonId, pokemon.id))
+        .where(eq(teamPokemon.teamId, input.teamId))
+        .orderBy(asc(teamPokemon.slot));
     }),
 
   create: protectedProcedure
     .input(
       z.object({
-        teamId: z.string().uuid(),
-        slot: z.number().int().min(0).max(5),
+        teamId: z.string().uuid().optional(),
+        slot: z.number().int().min(0).max(5).optional(),
         species: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Verify team ownership
-      const [team] = await ctx.db
-        .select({ id: teams.id })
-        .from(teams)
-        .where(
-          and(eq(teams.id, input.teamId), eq(teams.userId, ctx.userId)),
-        );
-      if (!team) throw new Error('Team not found');
+      // If teamId provided, verify team ownership
+      if (input.teamId) {
+        const [team] = await ctx.db
+          .select({ id: teams.id })
+          .from(teams)
+          .where(
+            and(eq(teams.id, input.teamId), eq(teams.userId, ctx.userId)),
+          );
+        if (!team) throw new Error('Team not found');
+      }
+
+      const slugBase = input.species || 'pokemon';
+      const slug = await uniquePokemonSlug(ctx.db, ctx.userId, slugBase);
 
       const [row] = await ctx.db
         .insert(pokemon)
         .values({
-          teamId: input.teamId,
-          slot: input.slot,
+          userId: ctx.userId,
           species: input.species ?? '',
+          slug,
         })
         .returning();
+
+      // If teamId and slot provided, create the team association
+      if (input.teamId && input.slot !== undefined) {
+        await ctx.db.insert(teamPokemon).values({
+          teamId: input.teamId,
+          pokemonId: row!.id,
+          slot: input.slot,
+        });
+      }
+
       return row!;
     }),
 
@@ -107,6 +219,20 @@ export const pokemonRouter = router({
       if (!owns) throw new Error('Pokemon not found');
 
       const { id, ...data } = input;
+
+      // Regenerate slug if name or species changed
+      if (data.name !== undefined || data.species !== undefined) {
+        const [current] = await ctx.db
+          .select({ name: pokemon.name, species: pokemon.species })
+          .from(pokemon)
+          .where(eq(pokemon.id, id));
+        const newName = data.name ?? current?.name;
+        const newSpecies = data.species ?? current?.species;
+        const slugBase = newName || newSpecies || 'pokemon';
+        const slug = await uniquePokemonSlug(ctx.db, ctx.userId, slugBase, id);
+        Object.assign(data, { slug });
+      }
+
       const [row] = await ctx.db
         .update(pokemon)
         .set(data)
@@ -118,39 +244,86 @@ export const pokemonRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const owns = await verifyPokemonOwnership(
-        ctx.db,
-        input.id,
-        ctx.userId,
-      );
+      const owns = await verifyPokemonOwnership(ctx.db, input.id, ctx.userId);
       if (!owns) throw new Error('Pokemon not found');
 
       await ctx.db.delete(pokemon).where(eq(pokemon.id, input.id));
       return { success: true };
     }),
 
-  reorder: protectedProcedure
+  addToTeam: protectedProcedure
     .input(
       z.object({
-        moves: z.array(z.object({ id: z.string().uuid(), slot: z.number().int().min(0).max(5) })),
+        pokemonId: z.string().uuid(),
+        teamId: z.string().uuid(),
+        slot: z.number().int().min(0).max(5),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Verify all pokemon belong to user
-      for (const move of input.moves) {
-        const owns = await verifyPokemonOwnership(
-          ctx.db,
-          move.id,
-          ctx.userId,
+      const owns = await verifyPokemonOwnership(ctx.db, input.pokemonId, ctx.userId);
+      if (!owns) throw new Error('Pokemon not found');
+
+      const [team] = await ctx.db
+        .select({ id: teams.id })
+        .from(teams)
+        .where(and(eq(teams.id, input.teamId), eq(teams.userId, ctx.userId)));
+      if (!team) throw new Error('Team not found');
+
+      await ctx.db.insert(teamPokemon).values({
+        teamId: input.teamId,
+        pokemonId: input.pokemonId,
+        slot: input.slot,
+      });
+      return { success: true };
+    }),
+
+  removeFromTeam: protectedProcedure
+    .input(
+      z.object({
+        pokemonId: z.string().uuid(),
+        teamId: z.string().uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const owns = await verifyPokemonOwnership(ctx.db, input.pokemonId, ctx.userId);
+      if (!owns) throw new Error('Pokemon not found');
+
+      await ctx.db
+        .delete(teamPokemon)
+        .where(
+          and(
+            eq(teamPokemon.teamId, input.teamId),
+            eq(teamPokemon.pokemonId, input.pokemonId),
+          ),
         );
-        if (!owns) throw new Error('Pokemon not found');
-      }
+      return { success: true };
+    }),
+
+  reorder: protectedProcedure
+    .input(
+      z.object({
+        teamId: z.string().uuid(),
+        moves: z.array(z.object({ pokemonId: z.string().uuid(), slot: z.number().int().min(0).max(5) })),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify team ownership
+      const [team] = await ctx.db
+        .select({ id: teams.id })
+        .from(teams)
+        .where(and(eq(teams.id, input.teamId), eq(teams.userId, ctx.userId)));
+      if (!team) throw new Error('Team not found');
 
       for (const move of input.moves) {
         await ctx.db
-          .update(pokemon)
+          .update(teamPokemon)
           .set({ slot: move.slot })
-          .where(eq(pokemon.id, move.id));
+          .where(
+            and(
+              eq(teamPokemon.teamId, input.teamId),
+              eq(teamPokemon.pokemonId, move.pokemonId),
+            ),
+          );
       }
       return { success: true };
     }),
