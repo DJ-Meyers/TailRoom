@@ -14,6 +14,8 @@ dist-ssr
 .vinxi
 app.config.timestamp_*
 *.local
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*

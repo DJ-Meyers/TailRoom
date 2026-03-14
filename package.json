@@ -16,10 +16,14 @@
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-router": "^1.166.7",
     "@tanstack/react-start": "^1.166.8",
+    "drizzle-orm": "^0.45.1",
+    "drizzle-zod": "^0.8.3",
     "pokemon-sprites": "github:PokeAPI/sprites",
+    "postgres": "^3.4.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "zod": "^4.3.6"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -32,6 +36,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9.39.1",
     "eslint-plugin-no-relative-import-paths": "^1.6.1",
     "eslint-plugin-prefer-arrow-functions": "^3.9.1",
