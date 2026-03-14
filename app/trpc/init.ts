@@ -1,20 +1,27 @@
+import { createClerkClient } from '@clerk/backend';
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 
 import { db } from '~/db';
+
+const clerk = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
+  publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+});
 
 export const createTRPCContext = async ({
   request,
 }: {
   request: Request;
 }) => {
-  // TODO: Phase 4 will add Clerk auth here
-  // For now, use a placeholder userId from a header (for testing)
-  const userId = request.headers.get('x-user-id') ?? undefined;
+  const requestState = await clerk.authenticateRequest(request, {
+    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+  });
+  const auth = requestState.toAuth();
 
   return {
     db,
-    userId,
+    userId: auth?.userId ?? undefined,
   };
 };
 
