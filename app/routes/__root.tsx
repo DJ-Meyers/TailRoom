@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Navbar } from '~/components/Navbar'
 import '~/index.css'
 import { TRPCProvider } from '~/trpc/client'
 import { getQueryClient, getTRPCClient } from '~/trpc/query-client'
@@ -17,6 +18,7 @@ const RootComponent = () => {
     >
       <QueryClientProvider client={queryClient}>
         <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+          <Navbar />
           <Outlet />
         </TRPCProvider>
       </QueryClientProvider>
