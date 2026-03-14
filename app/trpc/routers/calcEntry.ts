@@ -1,7 +1,7 @@
 import { and, asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { calcEntries, pokemon, teams } from '~/db/schema';
+import { calcEntries, pokemon } from '~/db/schema';
 import {
   fieldConditionsSchema,
   selectedPokemonModifiersSchema,
@@ -17,8 +17,7 @@ const verifyPokemonOwnership = async (
   const [row] = await db
     .select({ id: pokemon.id })
     .from(pokemon)
-    .innerJoin(teams, eq(pokemon.teamId, teams.id))
-    .where(and(eq(pokemon.id, pokemonId), eq(teams.userId, userId)));
+    .where(and(eq(pokemon.id, pokemonId), eq(pokemon.userId, userId)));
   return !!row;
 };
 
@@ -90,9 +89,8 @@ export const calcEntryRouter = router({
         .select({ id: calcEntries.id })
         .from(calcEntries)
         .innerJoin(pokemon, eq(calcEntries.pokemonId, pokemon.id))
-        .innerJoin(teams, eq(pokemon.teamId, teams.id))
         .where(
-          and(eq(calcEntries.id, input.id), eq(teams.userId, ctx.userId)),
+          and(eq(calcEntries.id, input.id), eq(pokemon.userId, ctx.userId)),
         );
       if (!existing) throw new Error('Calc entry not found');
 
@@ -112,9 +110,8 @@ export const calcEntryRouter = router({
         .select({ id: calcEntries.id })
         .from(calcEntries)
         .innerJoin(pokemon, eq(calcEntries.pokemonId, pokemon.id))
-        .innerJoin(teams, eq(pokemon.teamId, teams.id))
         .where(
-          and(eq(calcEntries.id, input.id), eq(teams.userId, ctx.userId)),
+          and(eq(calcEntries.id, input.id), eq(pokemon.userId, ctx.userId)),
         );
       if (!existing) throw new Error('Calc entry not found');
 

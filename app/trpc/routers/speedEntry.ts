@@ -1,7 +1,7 @@
 import { and, asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-import { pokemon, speedEntries, teams } from '~/db/schema';
+import { pokemon, speedEntries } from '~/db/schema';
 import { statsTableSchema } from '~/db/zod';
 import { protectedProcedure, router } from '~/trpc/init';
 
@@ -13,8 +13,7 @@ const verifyPokemonOwnership = async (
   const [row] = await db
     .select({ id: pokemon.id })
     .from(pokemon)
-    .innerJoin(teams, eq(pokemon.teamId, teams.id))
-    .where(and(eq(pokemon.id, pokemonId), eq(teams.userId, userId)));
+    .where(and(eq(pokemon.id, pokemonId), eq(pokemon.userId, userId)));
   return !!row;
 };
 
@@ -81,9 +80,8 @@ export const speedEntryRouter = router({
         .select({ id: speedEntries.id })
         .from(speedEntries)
         .innerJoin(pokemon, eq(speedEntries.pokemonId, pokemon.id))
-        .innerJoin(teams, eq(pokemon.teamId, teams.id))
         .where(
-          and(eq(speedEntries.id, input.id), eq(teams.userId, ctx.userId)),
+          and(eq(speedEntries.id, input.id), eq(pokemon.userId, ctx.userId)),
         );
       if (!existing) throw new Error('Speed entry not found');
 
@@ -103,9 +101,8 @@ export const speedEntryRouter = router({
         .select({ id: speedEntries.id })
         .from(speedEntries)
         .innerJoin(pokemon, eq(speedEntries.pokemonId, pokemon.id))
-        .innerJoin(teams, eq(pokemon.teamId, teams.id))
         .where(
-          and(eq(speedEntries.id, input.id), eq(teams.userId, ctx.userId)),
+          and(eq(speedEntries.id, input.id), eq(pokemon.userId, ctx.userId)),
         );
       if (!existing) throw new Error('Speed entry not found');
 

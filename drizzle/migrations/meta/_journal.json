@@ -8,6 +8,27 @@
       "when": 1773426035547,
       "tag": "0000_outgoing_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773504886557,
+      "tag": "0001_past_madelyne_pryor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773505289233,
+      "tag": "0002_add_pokemon_slug",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773505500000,
+      "tag": "0003_pokemon_many_to_many_teams",
+      "breakpoints": true
     }
   ]
 }
