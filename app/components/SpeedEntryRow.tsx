@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { ItemIcon } from '~/components/ItemIcon';
+import { Modal } from '~/components/Modal';
 import { PokemonIcon } from '~/components/PokemonIcon';
 import { PokemonPanel } from '~/components/PokemonPanel';
 import { getSpeciesAbilities } from '~/data/gen';
@@ -89,9 +90,6 @@ export const SpeedEntryRow = ({
         className="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none hover:bg-hover-bg"
         onClick={onToggleExpanded}
       >
-        <span className="shrink-0 text-sm text-text-dim w-4">
-          {entry.isExpanded ? '\u25BE' : '\u25B8'}
-        </span>
         <ItemIcon item={pokemon.item} />
         <PokemonIcon
           species={pokemon.species}
@@ -113,48 +111,59 @@ export const SpeedEntryRow = ({
           &times;
         </button>
       </div>
-      {entry.isExpanded && (
-        <div className="p-3 border-t border-border-lighter bg-detail-bg">
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              placeholder="Name (e.g. Scarf Ursh)"
-              value={entry.name}
-              onChange={(e) => onNameChange(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              className="flex-1 min-w-0 px-2 py-1 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint"
+      <Modal
+        open={entry.isExpanded}
+        onClose={onToggleExpanded}
+        title={
+          <span className="flex items-center gap-2 leading-none">
+            <ItemIcon item={pokemon.item} />
+            <PokemonIcon
+              species={pokemon.species}
+              className="shrink-0 relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle"
             />
-          </div>
-          <textarea
-            placeholder="Notes..."
-            value={entry.notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-            rows={2}
-            className="w-full px-2 py-1 mb-3 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint resize-y"
-          />
-          <PokemonPanel
-            label={prefix}
-            state={pokemon}
-            speciesAbilities={abilities}
-            showMove={false}
-            hideModifiers
-            compact
-            onSpeciesChange={onSpeciesChange}
-            onNatureChange={(nature) => onPokemonUpdate({ nature })}
-            onAbilityChange={(ability) => onPokemonUpdate({ ability })}
-            onItemChange={(item) => onPokemonUpdate({ item })}
-            onMoveChange={() => {}}
-            onEvChange={onEvChange}
-            onIvChange={onIvChange}
-            onTeraTypeChange={(teraType) => onPokemonUpdate({ teraType })}
-            onBoostChange={onBoostChange}
-            onStatusChange={(status) => onPokemonUpdate({ status })}
-            onIsCritChange={() => {}}
-            onParsed={handleParsed}
+            {entry.name && <span className="font-semibold text-text-heading">{entry.name}</span>}
+            <span className="text-xs text-text-dim">{formatSpeedEvHint(pokemon)}</span>
+            <span className={`font-semibold tabular-nums ${tierColor}`}>{speed}</span>
+          </span>
+        }
+      >
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            placeholder="Name (e.g. Scarf Ursh)"
+            value={entry.name}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="flex-1 min-w-0 px-2 py-1 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint"
           />
         </div>
-      )}
+        <textarea
+          placeholder="Notes..."
+          value={entry.notes}
+          onChange={(e) => onNotesChange(e.target.value)}
+          rows={2}
+          className="w-full px-2 py-1 mb-3 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint resize-y"
+        />
+        <PokemonPanel
+          label={prefix}
+          state={pokemon}
+          abilities={abilities}
+          showMove={false}
+          hideModifiers
+          compact
+          onSpeciesChange={onSpeciesChange}
+          onNatureChange={(nature) => onPokemonUpdate({ nature })}
+          onAbilityChange={(ability) => onPokemonUpdate({ ability })}
+          onItemChange={(item) => onPokemonUpdate({ item })}
+          onMoveChange={() => {}}
+          onEvChange={onEvChange}
+          onIvChange={onIvChange}
+          onTeraTypeChange={(teraType) => onPokemonUpdate({ teraType })}
+          onBoostChange={onBoostChange}
+          onStatusChange={(status) => onPokemonUpdate({ status })}
+          onIsCritChange={() => {}}
+          onParsed={handleParsed}
+        />
+      </Modal>
     </div>
   );
 };

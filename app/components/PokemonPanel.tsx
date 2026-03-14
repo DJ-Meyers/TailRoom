@@ -18,6 +18,10 @@ interface Props {
   showMove: boolean;
   hideModifiers?: boolean;
   compact?: boolean;
+  name?: string;
+  notes?: string;
+  onNameChange?: (name: string) => void;
+  onNotesChange?: (notes: string) => void;
   onSpeciesChange: (species: string) => void;
   onNatureChange: (nature: string) => void;
   onAbilityChange: (ability: string) => void;
@@ -31,10 +35,6 @@ interface Props {
   onIsCritChange: (isCrit: boolean) => void;
   onParsed: (result: ParseResult) => void;
   parseContext?: ParseContext;
-  name?: string;
-  notes?: string;
-  onNameChange?: (name: string) => void;
-  onNotesChange?: (notes: string) => void;
 }
 
 export const PokemonPanel = ({
@@ -44,6 +44,10 @@ export const PokemonPanel = ({
   showMove,
   hideModifiers,
   compact,
+  name,
+  notes,
+  onNameChange,
+  onNotesChange,
   onSpeciesChange,
   onNatureChange,
   onAbilityChange,
@@ -57,10 +61,6 @@ export const PokemonPanel = ({
   onIsCritChange,
   onParsed,
   parseContext,
-  name,
-  notes,
-  onNameChange,
-  onNotesChange,
 }: Props) => {
   const id = label.toLowerCase();
   return (
@@ -89,19 +89,21 @@ export const PokemonPanel = ({
       <ParseInput onParsed={onParsed} label={id} parseContext={parseContext} />
       <div className="flex gap-4 max-md:flex-col">
         <div className="flex-1 min-w-0">
-          <PokemonSelector
-            id={`${id}-species`}
-            value={state.species}
-            onChange={onSpeciesChange}
-          />
-          <NatureSelector id={`${id}-nature`} value={state.nature} onChange={onNatureChange} />
-          <AbilitySelector
-            id={`${id}-ability`}
-            value={state.ability}
-            onChange={onAbilityChange}
-            speciesAbilities={speciesAbilities}
-          />
-          <ItemSelector id={`${id}-item`} value={state.item} onChange={onItemChange} />
+          <div className="grid grid-cols-2 gap-x-3">
+            <PokemonSelector
+              id={`${id}-species`}
+              value={state.species}
+              onChange={onSpeciesChange}
+            />
+            <NatureSelector id={`${id}-nature`} value={state.nature} onChange={onNatureChange} />
+            <AbilitySelector
+              id={`${id}-ability`}
+              value={state.ability}
+              onChange={onAbilityChange}
+              speciesAbilities={speciesAbilities}
+            />
+            <ItemSelector id={`${id}-item`} value={state.item} onChange={onItemChange} />
+          </div>
           {!hideModifiers && (
             <>
               <Typeahead
@@ -149,8 +151,8 @@ export const PokemonPanel = ({
         <div className="shrink-0">
           <StatInputs
             species={state.species}
-            level={state.level}
             nature={state.nature}
+            level={state.level}
             evs={state.evs}
             ivs={state.ivs}
             boosts={state.boosts}

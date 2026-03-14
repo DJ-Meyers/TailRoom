@@ -1,5 +1,7 @@
 export type StatKey = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
 
+export type SpeedTier = 'faster' | 'tie' | 'slower';
+
 export interface StatsTable {
   hp: number;
   atk: number;
@@ -96,11 +98,9 @@ export interface SpeedEntry {
 export interface SpeedConditions {
   yourTailwind: boolean;
   enemyTailwind: boolean;
-  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow';
+  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow' | 'Hail';
   terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
 }
-
-export type SpeedTier = 'faster' | 'tie' | 'slower';
 
 export const STAT_KEYS: StatKey[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 
