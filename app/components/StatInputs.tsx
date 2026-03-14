@@ -1,13 +1,15 @@
 import { useMemo } from 'react';
+
 import { Pokemon } from '@smogon/calc';
+
 import { gen } from '~/data/gen';
 import type { StatKey, StatsTable } from '~/types';
 import { EV_STEP, MAX_EV_PER_STAT, MAX_TOTAL_EVS, STAT_KEYS, STAT_LABELS } from '~/types';
 
 interface Props {
   species: string;
-  level: number;
   nature: string;
+  level: number;
   evs: StatsTable;
   ivs: StatsTable;
   boosts: StatsTable;
@@ -19,7 +21,7 @@ interface Props {
 
 const BOOSTABLE_STATS: StatKey[] = ['atk', 'def', 'spa', 'spd', 'spe'];
 
-export const StatInputs = ({ species, level, nature, evs, ivs, boosts, hideBoosts, onEvChange, onIvChange, onBoostChange }: Props) => {
+export const StatInputs = ({ species, nature, level, evs, ivs, boosts, hideBoosts, onEvChange, onIvChange, onBoostChange }: Props) => {
   const totalEvs = STAT_KEYS.reduce((sum, key) => sum + evs[key], 0);
 
   const rawStats = useMemo(() => {
@@ -29,7 +31,7 @@ export const StatInputs = ({ species, level, nature, evs, ivs, boosts, hideBoost
     } catch {
       return null;
     }
-  }, [species, level, nature, evs, ivs]);
+  }, [species, nature, level, evs, ivs]);
 
   return (
     <div className="flex flex-col h-full">
@@ -41,6 +43,7 @@ export const StatInputs = ({ species, level, nature, evs, ivs, boosts, hideBoost
         <span className="w-14 text-center">EV</span>
         <span className="w-12 text-center">IV</span>
         {!hideBoosts && <span className="w-14 text-center">Boost</span>}
+        <span className="w-10 text-center">Stat</span>
       </div>
       {STAT_KEYS.map((stat) => {
         const canBoost = BOOSTABLE_STATS.includes(stat);
@@ -81,6 +84,9 @@ export const StatInputs = ({ species, level, nature, evs, ivs, boosts, hideBoost
             ) : (
               <span className="w-14" />
             ))}
+            <span className="w-10 text-xs font-semibold text-text tabular-nums text-center">
+              {rawStats ? rawStats[stat] : '—'}
+            </span>
           </div>
         );
       })}

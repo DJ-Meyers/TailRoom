@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 
 import { FieldConditionInputs } from '~/components/FieldConditionInputs';
 import { ItemIcon } from '~/components/ItemIcon';
+import { Modal } from '~/components/Modal';
 import { PokemonIcon } from '~/components/PokemonIcon';
 import { PokemonPanel } from '~/components/PokemonPanel';
 import { SelectedPokemonModifierInputs } from '~/components/SelectedPokemonModifierInputs';
@@ -216,7 +217,6 @@ export const CalcEntryRow = ({
   return (
     <div className="bg-surface rounded-md mb-2 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none hover:bg-hover-bg" onClick={onToggleExpanded}>
-        <span className="shrink-0 text-sm text-text-dim w-4">{entry.isExpanded ? '\u25BE' : '\u25B8'}</span>
         {entry.name && <span className="shrink-0 text-sm font-semibold text-text-heading">{entry.name}</span>}
         <span className={`flex-1 text-sm min-w-0 ${result ? '' : 'text-text-dim italic'}`}>
           {summary}
@@ -231,134 +231,122 @@ export const CalcEntryRow = ({
           &times;
         </button>
       </div>
-      {entry.isExpanded && (
-        <div className="p-3 border-t border-border-lighter bg-detail-bg">
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              placeholder="Name (e.g. Bulky BlUrsa)"
-              value={entry.name}
-              onChange={(e) => onNameChange(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              className="flex-1 min-w-0 px-2 py-1 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint"
-            />
-          </div>
-          <textarea
-            placeholder="Notes..."
-            value={entry.notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-            rows={2}
-            className="w-full px-2 py-1 mb-3 text-sm rounded border border-border-lighter bg-surface text-text-primary placeholder:text-text-faint resize-y"
-          />
-          {mode === 'defensive' ? (
-            <>
-              <div className="flex items-end gap-1 mb-1 leading-none">
-                <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
-                <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
-              </div>
-              <TargetModifierInputs
-                state={entry.opponent}
-                idPrefix={prefix}
-                showCrit={false}
-                move={entry.move}
-                onMoveChange={onMoveChange}
-                onUpdate={onOpponentUpdate}
-                onBoostChange={onBoostChange}
-              />
-            </>
-          ) : (
-            <>
-              <div className="flex items-end gap-1 mb-1 leading-none">
-                <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
-                <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
-              </div>
-              <SelectedPokemonModifierInputs
-                modifiers={critModifiers}
-                idPrefix={prefix}
-                showCrit
-                move={entry.move}
-                onMoveChange={onMoveChange}
-                onUpdate={handleSelectedModsUpdate}
-                onBoostChange={onSelectedPokemonBoostChange}
-              />
-            </>
-          )}
-          <FieldConditionInputs
-            field={entry.fieldConditions}
-            idPrefix={prefix}
-            onChange={onFieldChange}
-          />
-          <PokemonPanel
-            label={prefix}
+      <Modal
+        open={entry.isExpanded}
+        onClose={onToggleExpanded}
+        title={summary}
+      >
+        {mode === 'defensive' ? (
+          <>
+            <div className="flex items-end gap-1 mb-1 leading-none">
+              <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+              <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
+            </div>
+            <TargetModifierInputs
             state={entry.opponent}
-            speciesAbilities={abilities}
-            showMove={mode === 'defensive'}
-            hideModifiers
-            compact
-            onSpeciesChange={onSpeciesChange}
-            onNatureChange={(nature) => onOpponentUpdate({ nature })}
-            onAbilityChange={(ability) => onOpponentUpdate({ ability })}
-            onItemChange={(item) => onOpponentUpdate({ item })}
-            onMoveChange={(move) => {
-              onMoveChange(move);
-              if (mode === 'defensive') onOpponentUpdate({ move });
-            }}
-            onEvChange={onEvChange}
-            onIvChange={onIvChange}
-            onTeraTypeChange={(teraType) => onOpponentUpdate({ teraType })}
+            idPrefix={prefix}
+            showCrit={false}
+            move={entry.move}
+            onMoveChange={onMoveChange}
+            onUpdate={onOpponentUpdate}
             onBoostChange={onBoostChange}
-            onStatusChange={(status) => onOpponentUpdate({ status })}
-            onIsCritChange={(isCrit) => onOpponentUpdate({ isCrit })}
-            onParsed={(parsed) => {
-              if (parsed.move && mode === 'offensive') onMoveChange(parsed.move);
-              if (parsed.move && mode === 'defensive') onOpponentUpdate({ move: parsed.move });
-              if (parsed.fieldConditions) onFieldChange({ ...entry.fieldConditions, ...parsed.fieldConditions });
-              const patch: Partial<PokemonState> = {};
-              if (parsed.species) patch.species = parsed.species;
-              if (parsed.nature) patch.nature = parsed.nature;
-              if (parsed.ability) patch.ability = parsed.ability;
-              if (parsed.item !== undefined) patch.item = parsed.item;
-              if (parsed.level !== undefined) patch.level = parsed.level;
-              if (parsed.teraType !== undefined) patch.teraType = parsed.teraType;
-              if (parsed.status !== undefined) patch.status = parsed.status;
-              if (parsed.isCrit !== undefined) patch.isCrit = parsed.isCrit;
-              if (parsed.abilityOn !== undefined) patch.abilityOn = parsed.abilityOn;
-              if (parsed.boostedStat !== undefined) patch.boostedStat = parsed.boostedStat;
-              if (Object.keys(patch).length > 0) onOpponentUpdate(patch);
-            }}
           />
-          {mode === 'offensive' ? (
-            <>
-              <div className="flex items-end gap-1 mb-1 leading-none">
-                <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
-                <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
-              </div>
-              <TargetModifierInputs
-                state={entry.opponent}
-                idPrefix={prefix}
-                showCrit={false}
-                onUpdate={onOpponentUpdate}
-                onBoostChange={onBoostChange}
-              />
-            </>
-          ) : (
-            <>
-              <div className="flex items-end gap-1 mb-1 leading-none">
-                <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
-                <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
-              </div>
-              <SelectedPokemonModifierInputs
-                modifiers={critModifiers}
-                idPrefix={prefix}
-                showCrit
-                onUpdate={handleSelectedModsUpdate}
-                onBoostChange={onSelectedPokemonBoostChange}
-              />
-            </>
-          )}
-        </div>
-      )}
+          </>
+        ) : (
+          <>
+            <div className="flex items-end gap-1 mb-1 leading-none">
+              <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+              <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
+            </div>
+            <SelectedPokemonModifierInputs
+            modifiers={critModifiers}
+            idPrefix={prefix}
+            showCrit
+            move={entry.move}
+            onMoveChange={onMoveChange}
+            onUpdate={handleSelectedModsUpdate}
+            onBoostChange={onSelectedPokemonBoostChange}
+          />
+          </>
+        )}
+        <FieldConditionInputs
+          field={entry.fieldConditions}
+          idPrefix={prefix}
+          onChange={onFieldChange}
+        />
+        <PokemonPanel
+          label={prefix}
+          state={entry.opponent}
+          speciesAbilities={abilities}
+          showMove={mode === 'defensive'}
+          hideModifiers
+          compact
+          name={entry.name}
+          notes={entry.notes}
+          onNameChange={onNameChange}
+          onNotesChange={onNotesChange}
+          onSpeciesChange={onSpeciesChange}
+          onNatureChange={(nature) => onOpponentUpdate({ nature })}
+          onAbilityChange={(ability) => onOpponentUpdate({ ability })}
+          onItemChange={(item) => onOpponentUpdate({ item })}
+          onMoveChange={(move) => {
+            onMoveChange(move);
+            if (mode === 'defensive') onOpponentUpdate({ move });
+          }}
+          onEvChange={onEvChange}
+          onIvChange={onIvChange}
+          onTeraTypeChange={(teraType) => onOpponentUpdate({ teraType })}
+          onBoostChange={onBoostChange}
+          onStatusChange={(status) => onOpponentUpdate({ status })}
+          onIsCritChange={(isCrit) => onOpponentUpdate({ isCrit })}
+          onParsed={(parsed) => {
+            if (parsed.move && mode === 'offensive') onMoveChange(parsed.move);
+            if (parsed.move && mode === 'defensive') onOpponentUpdate({ move: parsed.move });
+            if (parsed.fieldConditions) onFieldChange({ ...entry.fieldConditions, ...parsed.fieldConditions });
+            const patch: Partial<PokemonState> = {};
+            if (parsed.species) patch.species = parsed.species;
+            if (parsed.nature) patch.nature = parsed.nature;
+            if (parsed.ability) patch.ability = parsed.ability;
+            if (parsed.item !== undefined) patch.item = parsed.item;
+            if (parsed.level !== undefined) patch.level = parsed.level;
+            if (parsed.teraType !== undefined) patch.teraType = parsed.teraType;
+            if (parsed.status !== undefined) patch.status = parsed.status;
+            if (parsed.isCrit !== undefined) patch.isCrit = parsed.isCrit;
+            if (parsed.abilityOn !== undefined) patch.abilityOn = parsed.abilityOn;
+            if (parsed.boostedStat !== undefined) patch.boostedStat = parsed.boostedStat;
+            if (Object.keys(patch).length > 0) onOpponentUpdate(patch);
+          }}
+        />
+        {mode === 'offensive' ? (
+          <>
+            <div className="flex items-end gap-1 mb-1 leading-none">
+              <PokemonIcon species={entry.opponent.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+              <span className="text-sm font-semibold text-text-dim">{entry.opponent.species} Modifiers</span>
+            </div>
+            <TargetModifierInputs
+              state={entry.opponent}
+              idPrefix={prefix}
+              showCrit={false}
+              onUpdate={onOpponentUpdate}
+              onBoostChange={onBoostChange}
+            />
+          </>
+        ) : (
+          <>
+            <div className="flex items-end gap-1 mb-1 leading-none">
+              <PokemonIcon species={selectedPokemon.species} className="relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle" />
+              <span className="text-sm font-semibold text-text-dim">{selectedPokemon.species} Modifiers</span>
+            </div>
+            <SelectedPokemonModifierInputs
+              modifiers={critModifiers}
+              idPrefix={prefix}
+              showCrit
+              onUpdate={handleSelectedModsUpdate}
+              onBoostChange={onSelectedPokemonBoostChange}
+            />
+          </>
+        )}
+      </Modal>
     </div>
   );
 };
