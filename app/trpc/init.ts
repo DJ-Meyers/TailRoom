@@ -1,27 +1,38 @@
-import { createClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 import { initTRPC, TRPCError } from '@trpc/server';
+import type { IncomingMessage } from 'node:http';
 import superjson from 'superjson';
 
 import { db } from '~/db';
 
-const clerk = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-  publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
-});
-
 export const createTRPCContext = async ({
-  request,
+  req,
 }: {
-  request: Request;
+  req: IncomingMessage;
 }) => {
-  const requestState = await clerk.authenticateRequest(request, {
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
-  });
-  const auth = requestState.toAuth();
+  if (process.env.VITE_DEV_BYPASS_AUTH === 'true') {
+    return {
+      db,
+      userId: process.env.VITE_DEV_USER_ID ?? 'dev-user',
+    };
+  }
+
+  let userId: string | undefined;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      const payload = await verifyToken(authHeader.slice(7), {
+        secretKey: process.env.CLERK_SECRET_KEY!,
+      });
+      userId = payload.sub;
+    } catch {
+      // Invalid token
+    }
+  }
 
   return {
     db,
-    userId: auth?.userId ?? undefined,
+    userId,
   };
 };
 
