@@ -13,7 +13,14 @@ import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as CalcRouteImport } from './routes/calc'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedPokemonRouteImport } from './routes/_authenticated/pokemon'
+import { Route as AuthenticatedTeamsIndexRouteImport } from './routes/_authenticated/teams/index'
+import { Route as AuthenticatedPokemonIndexRouteImport } from './routes/_authenticated/pokemon/index'
+import { Route as AuthenticatedTeamsTeamSlugRouteImport } from './routes/_authenticated/teams/$teamSlug'
+import { Route as AuthenticatedPokemonNameSlugRouteImport } from './routes/_authenticated/pokemon/$nameSlug'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -35,11 +42,48 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPokemonRoute = AuthenticatedPokemonRouteImport.update({
+  id: '/pokemon',
+  path: '/pokemon',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTeamsIndexRoute = AuthenticatedTeamsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedTeamsRoute,
+} as any)
+const AuthenticatedPokemonIndexRoute =
+  AuthenticatedPokemonIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPokemonRoute,
+  } as any)
+const AuthenticatedTeamsTeamSlugRoute =
+  AuthenticatedTeamsTeamSlugRouteImport.update({
+    id: '/$teamSlug',
+    path: '/$teamSlug',
+    getParentRoute: () => AuthenticatedTeamsRoute,
+  } as any)
+const AuthenticatedPokemonNameSlugRoute =
+  AuthenticatedPokemonNameSlugRouteImport.update({
+    id: '/$nameSlug',
+    path: '/$nameSlug',
+    getParentRoute: () => AuthenticatedPokemonRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +91,12 @@ export interface FileRoutesByFullPath {
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/pokemon': typeof AuthenticatedPokemonRouteWithChildren
+  '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
+  '/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
+  '/pokemon/': typeof AuthenticatedPokemonIndexRoute
+  '/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,14 +104,25 @@ export interface FileRoutesByTo {
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
+  '/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
+  '/pokemon': typeof AuthenticatedPokemonIndexRoute
+  '/teams': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/account': typeof AccountRoute
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/_authenticated/pokemon': typeof AuthenticatedPokemonRouteWithChildren
+  '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/_authenticated/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
+  '/_authenticated/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
+  '/_authenticated/pokemon/': typeof AuthenticatedPokemonIndexRoute
+  '/_authenticated/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,6 +132,12 @@ export interface FileRouteTypes {
     | '/calc'
     | '/sign-in'
     | '/sign-up'
+    | '/pokemon'
+    | '/teams'
+    | '/pokemon/$nameSlug'
+    | '/teams/$teamSlug'
+    | '/pokemon/'
+    | '/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -78,17 +145,29 @@ export interface FileRouteTypes {
     | '/calc'
     | '/sign-in'
     | '/sign-up'
+    | '/pokemon/$nameSlug'
+    | '/teams/$teamSlug'
+    | '/pokemon'
+    | '/teams'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/account'
     | '/calc'
     | '/sign-in'
     | '/sign-up'
+    | '/_authenticated/pokemon'
+    | '/_authenticated/teams'
+    | '/_authenticated/pokemon/$nameSlug'
+    | '/_authenticated/teams/$teamSlug'
+    | '/_authenticated/pokemon/'
+    | '/_authenticated/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccountRoute: typeof AccountRoute
   CalcRoute: typeof CalcRoute
   SignInRoute: typeof SignInRoute
@@ -125,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -132,11 +218,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/teams': {
+      id: '/_authenticated/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pokemon': {
+      id: '/_authenticated/pokemon'
+      path: '/pokemon'
+      fullPath: '/pokemon'
+      preLoaderRoute: typeof AuthenticatedPokemonRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teams/': {
+      id: '/_authenticated/teams/'
+      path: '/'
+      fullPath: '/teams/'
+      preLoaderRoute: typeof AuthenticatedTeamsIndexRouteImport
+      parentRoute: typeof AuthenticatedTeamsRoute
+    }
+    '/_authenticated/pokemon/': {
+      id: '/_authenticated/pokemon/'
+      path: '/'
+      fullPath: '/pokemon/'
+      preLoaderRoute: typeof AuthenticatedPokemonIndexRouteImport
+      parentRoute: typeof AuthenticatedPokemonRoute
+    }
+    '/_authenticated/teams/$teamSlug': {
+      id: '/_authenticated/teams/$teamSlug'
+      path: '/$teamSlug'
+      fullPath: '/teams/$teamSlug'
+      preLoaderRoute: typeof AuthenticatedTeamsTeamSlugRouteImport
+      parentRoute: typeof AuthenticatedTeamsRoute
+    }
+    '/_authenticated/pokemon/$nameSlug': {
+      id: '/_authenticated/pokemon/$nameSlug'
+      path: '/$nameSlug'
+      fullPath: '/pokemon/$nameSlug'
+      preLoaderRoute: typeof AuthenticatedPokemonNameSlugRouteImport
+      parentRoute: typeof AuthenticatedPokemonRoute
+    }
   }
 }
 
+interface AuthenticatedPokemonRouteChildren {
+  AuthenticatedPokemonNameSlugRoute: typeof AuthenticatedPokemonNameSlugRoute
+  AuthenticatedPokemonIndexRoute: typeof AuthenticatedPokemonIndexRoute
+}
+
+const AuthenticatedPokemonRouteChildren: AuthenticatedPokemonRouteChildren = {
+  AuthenticatedPokemonNameSlugRoute: AuthenticatedPokemonNameSlugRoute,
+  AuthenticatedPokemonIndexRoute: AuthenticatedPokemonIndexRoute,
+}
+
+const AuthenticatedPokemonRouteWithChildren =
+  AuthenticatedPokemonRoute._addFileChildren(AuthenticatedPokemonRouteChildren)
+
+interface AuthenticatedTeamsRouteChildren {
+  AuthenticatedTeamsTeamSlugRoute: typeof AuthenticatedTeamsTeamSlugRoute
+  AuthenticatedTeamsIndexRoute: typeof AuthenticatedTeamsIndexRoute
+}
+
+const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
+  AuthenticatedTeamsTeamSlugRoute: AuthenticatedTeamsTeamSlugRoute,
+  AuthenticatedTeamsIndexRoute: AuthenticatedTeamsIndexRoute,
+}
+
+const AuthenticatedTeamsRouteWithChildren =
+  AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedPokemonRoute: typeof AuthenticatedPokemonRouteWithChildren
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedPokemonRoute: AuthenticatedPokemonRouteWithChildren,
+  AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccountRoute: AccountRoute,
   CalcRoute: CalcRoute,
   SignInRoute: SignInRoute,
