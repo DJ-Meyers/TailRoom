@@ -112,6 +112,7 @@ function TeamDetailPage() {
             value={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
             onBlur={handleSaveName}
+            maxLength={24}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSaveName();
               if (e.key === 'Escape') setEditingName(false);

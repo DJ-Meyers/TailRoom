@@ -9,6 +9,7 @@ import {
   timestamp,
   unique,
   uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
 
 export const teams = pgTable(
@@ -16,7 +17,7 @@ export const teams = pgTable(
   {
     id: uuid().defaultRandom().primaryKey(),
     userId: text().notNull(),
-    name: text().notNull(),
+    name: varchar({ length: 24 }).notNull(),
     slug: text().notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true })

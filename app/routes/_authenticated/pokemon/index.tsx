@@ -44,18 +44,57 @@ function PokemonListPage() {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                {pokeTeams.map((t) => (
-                  <Link
-                    key={t.teamSlug}
-                    to="/teams/$teamSlug"
-                    params={{ teamSlug: t.teamSlug }}
-                    className="text-sm text-text-muted hover:text-text"
-                  >
-                    {t.teamName}
-                  </Link>
-                ))}
-              </div>
+              {pokeTeams.length > 0 && (
+                <div className="text-sm text-text-muted">
+                  used on:{' '}
+                  {pokeTeams.length === 1 ? (
+                    <Link
+                      to="/teams/$teamSlug"
+                      params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                      className="hover:text-text"
+                    >
+                      {pokeTeams[0]!.teamName}
+                    </Link>
+                  ) : pokeTeams.length === 2 ? (
+                    <>
+                      <Link
+                        to="/teams/$teamSlug"
+                        params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                        className="hover:text-text"
+                      >
+                        {pokeTeams[0]!.teamName}
+                      </Link>
+                      {' and '}
+                      <Link
+                        to="/teams/$teamSlug"
+                        params={{ teamSlug: pokeTeams[1]!.teamSlug }}
+                        className="hover:text-text"
+                      >
+                        {pokeTeams[1]!.teamName}
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/teams/$teamSlug"
+                        params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                        className="hover:text-text"
+                      >
+                        {pokeTeams[0]!.teamName}
+                      </Link>
+                      {', '}
+                      <Link
+                        to="/teams/$teamSlug"
+                        params={{ teamSlug: pokeTeams[1]!.teamSlug }}
+                        className="hover:text-text"
+                      >
+                        {pokeTeams[1]!.teamName}
+                      </Link>
+                      {`, and ${pokeTeams.length - 2} other${pokeTeams.length - 2 === 1 ? '' : 's'}`}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
