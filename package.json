@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "db:migrate": "pnpm drizzle-kit migrate",
     "db:push": "pnpm drizzle-kit push",
+    "db:seed": "pnpm tsx app/db/seed.ts",
     "db:studio": "pnpm drizzle-kit studio",
     "lint": "eslint .",
     "new-worktree": "bash setup.sh"
@@ -56,6 +57,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^16.5.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
     "vite": "^7.3.1",

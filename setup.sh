@@ -32,5 +32,8 @@ pnpm install
 echo "Running migrations..."
 pnpm db:migrate
 
+echo "Seeding database..."
+pnpm db:seed
+
 echo ""
 echo "Setup complete! Database: $DB_NAME"
