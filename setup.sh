@@ -22,8 +22,9 @@ DB_NAME=$(echo "$DB_NAME" | sed 's/[^a-zA-Z0-9_]/_/g')
 echo "Creating database $DB_NAME..."
 createdb "$DB_NAME" 2>/dev/null || echo "Database $DB_NAME already exists, skipping."
 
-# Update DATABASE_URL in .env
-sed -i '' "s|^DATABASE_URL=.*|DATABASE_URL=postgresql://postgres:postgres@localhost:5432/$DB_NAME|" .env
+# Update DATABASE_URL in .env using the current system user (macOS Postgres default)
+PG_USER=$(whoami)
+sed -i '' "s|^DATABASE_URL=.*|DATABASE_URL=postgresql://$PG_USER@localhost:5432/$DB_NAME|" .env
 
 echo "Installing dependencies..."
 pnpm install
