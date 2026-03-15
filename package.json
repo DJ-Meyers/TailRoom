@@ -10,7 +10,8 @@
     "db:migrate": "pnpm drizzle-kit migrate",
     "db:push": "pnpm drizzle-kit push",
     "db:studio": "pnpm drizzle-kit studio",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "new-worktree": "bash setup.sh"
   },
   "dependencies": {
     "@clerk/backend": "^3.2.0",
