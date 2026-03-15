@@ -75,7 +75,7 @@ export const teamRouter = router({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(z.object({ name: z.string().min(1).max(24) }))
     .mutation(async ({ ctx, input }) => {
       const slug = await uniqueSlug(ctx.db, ctx.userId, input.name);
       const [team] = await ctx.db
@@ -86,7 +86,7 @@ export const teamRouter = router({
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.string().uuid(), name: z.string().min(1) }))
+    .input(z.object({ id: z.string().uuid(), name: z.string().min(1).max(24) }))
     .mutation(async ({ ctx, input }) => {
       const slug = await uniqueSlug(ctx.db, ctx.userId, input.name, input.id);
       const [team] = await ctx.db

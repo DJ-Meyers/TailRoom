@@ -57,6 +57,7 @@ function TeamsPage() {
           onChange={(e) => setNewTeamName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           placeholder="Team name..."
+          maxLength={24}
           className="flex-1 px-3 py-2 rounded bg-surface text-text border border-border"
         />
         <button
