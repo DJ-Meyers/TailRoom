@@ -1,18 +1,17 @@
 #!/bin/bash
 set -e
 
-# Find the main repo's git-crypt key (worktrees don't have their own)
-MAIN_GIT_DIR=$(git rev-parse --git-common-dir)
-KEY_FILE="$MAIN_GIT_DIR/git-crypt/keys/default"
+# Copy .env from the main repo (worktrees don't have their own)
+MAIN_REPO=$(git rev-parse --git-common-dir | sed 's|/\.git$||; s|/\.git/worktrees/.*||')
 
-if [ ! -f "$KEY_FILE" ]; then
-  echo "Error: git-crypt key not found at $KEY_FILE"
-  echo "Make sure git-crypt is unlocked in the main repo first."
+if [ -f "$MAIN_REPO/.env" ]; then
+  echo "Copying .env from main repo..."
+  cp "$MAIN_REPO/.env" .env
+else
+  echo "Error: No .env found in main repo ($MAIN_REPO)"
+  echo "Create one from .env.example first."
   exit 1
 fi
-
-echo "Unlocking git-crypt..."
-git-crypt unlock "$KEY_FILE"
 
 # Derive a database name from the worktree directory name
 WORKTREE_NAME=$(basename "$PWD")
