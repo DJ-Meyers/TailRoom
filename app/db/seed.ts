@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 
 import { db } from './index';
-import { calcEntries, pokemon, speedEntries, teamPokemon, teams } from './schema';
+import { calcEntries, pokemon, speedEntries, teamPokemon, teams, users } from './schema';
 
 async function resolveUserId(): Promise<string> {
   if (process.env.SEED_USER_ID) {
@@ -63,6 +63,16 @@ async function seed() {
   }
 
   console.log(`Seeding database for user "${userId}"...`);
+
+  // 0. Ensure user record exists
+  const userSlug = userId.startsWith('user_')
+    ? userId.slice(5, 17).toLowerCase()
+    : userId.slice(0, 12).toLowerCase();
+  await db
+    .insert(users)
+    .values({ clerkId: userId, slug: userSlug })
+    .onConflictDoNothing();
+  console.log(`  Ensured user record with slug "${userSlug}"`);
 
   // 1. Create teams
   const [rainTeam, sunTeam, trickRoomTeam] = await db

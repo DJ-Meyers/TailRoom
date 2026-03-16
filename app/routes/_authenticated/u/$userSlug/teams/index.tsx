@@ -5,11 +5,12 @@ import { useState } from 'react';
 
 import { useTRPC } from '~/trpc/client';
 
-export const Route = createFileRoute('/_authenticated/teams/')({
+export const Route = createFileRoute('/_authenticated/u/$userSlug/teams/')({
   component: TeamsPage,
 });
 
 function TeamsPage() {
+  const { userSlug } = Route.useParams();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -22,7 +23,10 @@ function TeamsPage() {
       onSuccess: (team) => {
         queryClient.invalidateQueries({ queryKey: trpc.team.list.queryKey() });
         setNewTeamName('');
-        navigate({ to: '/teams/$teamSlug', params: { teamSlug: team.slug } });
+        navigate({
+          to: '/u/$userSlug/teams/$teamSlug',
+          params: { userSlug, teamSlug: team.slug },
+        });
       },
     }),
   );
@@ -83,8 +87,8 @@ function TeamsPage() {
               className="flex items-center justify-between p-4 rounded bg-surface border border-border"
             >
               <Link
-                to="/teams/$teamSlug"
-                params={{ teamSlug: team.slug }}
+                to="/u/$userSlug/teams/$teamSlug"
+                params={{ userSlug, teamSlug: team.slug }}
                 className="text-lg text-primary hover:underline"
               >
                 {team.name}

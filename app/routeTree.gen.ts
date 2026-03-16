@@ -15,12 +15,17 @@ import { Route as CalcRouteImport } from './routes/calc'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
-import { Route as AuthenticatedPokemonRouteImport } from './routes/_authenticated/pokemon'
-import { Route as AuthenticatedTeamsIndexRouteImport } from './routes/_authenticated/teams/index'
-import { Route as AuthenticatedPokemonIndexRouteImport } from './routes/_authenticated/pokemon/index'
-import { Route as AuthenticatedTeamsTeamSlugRouteImport } from './routes/_authenticated/teams/$teamSlug'
-import { Route as AuthenticatedPokemonNameSlugRouteImport } from './routes/_authenticated/pokemon/$nameSlug'
+import { Route as AuthenticatedUUserSlugRouteImport } from './routes/_authenticated/u/$userSlug'
+import { Route as AuthenticatedUUserSlugTeamsRouteImport } from './routes/_authenticated/u/$userSlug/teams'
+import { Route as AuthenticatedUUserSlugTRouteImport } from './routes/_authenticated/u/$userSlug/t'
+import { Route as AuthenticatedUUserSlugPokemonRouteImport } from './routes/_authenticated/u/$userSlug/pokemon'
+import { Route as AuthenticatedUUserSlugTeamsIndexRouteImport } from './routes/_authenticated/u/$userSlug/teams/index'
+import { Route as AuthenticatedUUserSlugTIndexRouteImport } from './routes/_authenticated/u/$userSlug/t/index'
+import { Route as AuthenticatedUUserSlugPokemonIndexRouteImport } from './routes/_authenticated/u/$userSlug/pokemon/index'
+import { Route as AuthenticatedUUserSlugTeamsTeamSlugRouteImport } from './routes/_authenticated/u/$userSlug/teams/$teamSlug'
+import { Route as AuthenticatedUUserSlugTTeamSlugRouteImport } from './routes/_authenticated/u/$userSlug/t/$teamSlug'
+import { Route as AuthenticatedUUserSlugPokemonNewRouteImport } from './routes/_authenticated/u/$userSlug/pokemon/new'
+import { Route as AuthenticatedUUserSlugPokemonNameSlugRouteImport } from './routes/_authenticated/u/$userSlug/pokemon/$nameSlug'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -51,38 +56,69 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
+const AuthenticatedUUserSlugRoute = AuthenticatedUUserSlugRouteImport.update({
+  id: '/u/$userSlug',
+  path: '/u/$userSlug',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPokemonRoute = AuthenticatedPokemonRouteImport.update({
-  id: '/pokemon',
-  path: '/pokemon',
-  getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedUUserSlugTeamsRoute =
+  AuthenticatedUUserSlugTeamsRouteImport.update({
+    id: '/teams',
+    path: '/teams',
+    getParentRoute: () => AuthenticatedUUserSlugRoute,
+  } as any)
+const AuthenticatedUUserSlugTRoute = AuthenticatedUUserSlugTRouteImport.update({
+  id: '/t',
+  path: '/t',
+  getParentRoute: () => AuthenticatedUUserSlugRoute,
 } as any)
-const AuthenticatedTeamsIndexRoute = AuthenticatedTeamsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedTeamsRoute,
-} as any)
-const AuthenticatedPokemonIndexRoute =
-  AuthenticatedPokemonIndexRouteImport.update({
+const AuthenticatedUUserSlugPokemonRoute =
+  AuthenticatedUUserSlugPokemonRouteImport.update({
+    id: '/pokemon',
+    path: '/pokemon',
+    getParentRoute: () => AuthenticatedUUserSlugRoute,
+  } as any)
+const AuthenticatedUUserSlugTeamsIndexRoute =
+  AuthenticatedUUserSlugTeamsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedPokemonRoute,
+    getParentRoute: () => AuthenticatedUUserSlugTeamsRoute,
   } as any)
-const AuthenticatedTeamsTeamSlugRoute =
-  AuthenticatedTeamsTeamSlugRouteImport.update({
+const AuthenticatedUUserSlugTIndexRoute =
+  AuthenticatedUUserSlugTIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedUUserSlugTRoute,
+  } as any)
+const AuthenticatedUUserSlugPokemonIndexRoute =
+  AuthenticatedUUserSlugPokemonIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedUUserSlugPokemonRoute,
+  } as any)
+const AuthenticatedUUserSlugTeamsTeamSlugRoute =
+  AuthenticatedUUserSlugTeamsTeamSlugRouteImport.update({
     id: '/$teamSlug',
     path: '/$teamSlug',
-    getParentRoute: () => AuthenticatedTeamsRoute,
+    getParentRoute: () => AuthenticatedUUserSlugTeamsRoute,
   } as any)
-const AuthenticatedPokemonNameSlugRoute =
-  AuthenticatedPokemonNameSlugRouteImport.update({
+const AuthenticatedUUserSlugTTeamSlugRoute =
+  AuthenticatedUUserSlugTTeamSlugRouteImport.update({
+    id: '/$teamSlug',
+    path: '/$teamSlug',
+    getParentRoute: () => AuthenticatedUUserSlugTRoute,
+  } as any)
+const AuthenticatedUUserSlugPokemonNewRoute =
+  AuthenticatedUUserSlugPokemonNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedUUserSlugPokemonRoute,
+  } as any)
+const AuthenticatedUUserSlugPokemonNameSlugRoute =
+  AuthenticatedUUserSlugPokemonNameSlugRouteImport.update({
     id: '/$nameSlug',
     path: '/$nameSlug',
-    getParentRoute: () => AuthenticatedPokemonRoute,
+    getParentRoute: () => AuthenticatedUUserSlugPokemonRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -91,12 +127,17 @@ export interface FileRoutesByFullPath {
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/pokemon': typeof AuthenticatedPokemonRouteWithChildren
-  '/teams': typeof AuthenticatedTeamsRouteWithChildren
-  '/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
-  '/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
-  '/pokemon/': typeof AuthenticatedPokemonIndexRoute
-  '/teams/': typeof AuthenticatedTeamsIndexRoute
+  '/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
+  '/u/$userSlug/pokemon': typeof AuthenticatedUUserSlugPokemonRouteWithChildren
+  '/u/$userSlug/t': typeof AuthenticatedUUserSlugTRouteWithChildren
+  '/u/$userSlug/teams': typeof AuthenticatedUUserSlugTeamsRouteWithChildren
+  '/u/$userSlug/pokemon/$nameSlug': typeof AuthenticatedUUserSlugPokemonNameSlugRoute
+  '/u/$userSlug/pokemon/new': typeof AuthenticatedUUserSlugPokemonNewRoute
+  '/u/$userSlug/t/$teamSlug': typeof AuthenticatedUUserSlugTTeamSlugRoute
+  '/u/$userSlug/teams/$teamSlug': typeof AuthenticatedUUserSlugTeamsTeamSlugRoute
+  '/u/$userSlug/pokemon/': typeof AuthenticatedUUserSlugPokemonIndexRoute
+  '/u/$userSlug/t/': typeof AuthenticatedUUserSlugTIndexRoute
+  '/u/$userSlug/teams/': typeof AuthenticatedUUserSlugTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -104,10 +145,14 @@ export interface FileRoutesByTo {
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
-  '/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
-  '/pokemon': typeof AuthenticatedPokemonIndexRoute
-  '/teams': typeof AuthenticatedTeamsIndexRoute
+  '/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
+  '/u/$userSlug/pokemon/$nameSlug': typeof AuthenticatedUUserSlugPokemonNameSlugRoute
+  '/u/$userSlug/pokemon/new': typeof AuthenticatedUUserSlugPokemonNewRoute
+  '/u/$userSlug/t/$teamSlug': typeof AuthenticatedUUserSlugTTeamSlugRoute
+  '/u/$userSlug/teams/$teamSlug': typeof AuthenticatedUUserSlugTeamsTeamSlugRoute
+  '/u/$userSlug/pokemon': typeof AuthenticatedUUserSlugPokemonIndexRoute
+  '/u/$userSlug/t': typeof AuthenticatedUUserSlugTIndexRoute
+  '/u/$userSlug/teams': typeof AuthenticatedUUserSlugTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,12 +162,17 @@ export interface FileRoutesById {
   '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/_authenticated/pokemon': typeof AuthenticatedPokemonRouteWithChildren
-  '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
-  '/_authenticated/pokemon/$nameSlug': typeof AuthenticatedPokemonNameSlugRoute
-  '/_authenticated/teams/$teamSlug': typeof AuthenticatedTeamsTeamSlugRoute
-  '/_authenticated/pokemon/': typeof AuthenticatedPokemonIndexRoute
-  '/_authenticated/teams/': typeof AuthenticatedTeamsIndexRoute
+  '/_authenticated/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
+  '/_authenticated/u/$userSlug/pokemon': typeof AuthenticatedUUserSlugPokemonRouteWithChildren
+  '/_authenticated/u/$userSlug/t': typeof AuthenticatedUUserSlugTRouteWithChildren
+  '/_authenticated/u/$userSlug/teams': typeof AuthenticatedUUserSlugTeamsRouteWithChildren
+  '/_authenticated/u/$userSlug/pokemon/$nameSlug': typeof AuthenticatedUUserSlugPokemonNameSlugRoute
+  '/_authenticated/u/$userSlug/pokemon/new': typeof AuthenticatedUUserSlugPokemonNewRoute
+  '/_authenticated/u/$userSlug/t/$teamSlug': typeof AuthenticatedUUserSlugTTeamSlugRoute
+  '/_authenticated/u/$userSlug/teams/$teamSlug': typeof AuthenticatedUUserSlugTeamsTeamSlugRoute
+  '/_authenticated/u/$userSlug/pokemon/': typeof AuthenticatedUUserSlugPokemonIndexRoute
+  '/_authenticated/u/$userSlug/t/': typeof AuthenticatedUUserSlugTIndexRoute
+  '/_authenticated/u/$userSlug/teams/': typeof AuthenticatedUUserSlugTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,12 +182,17 @@ export interface FileRouteTypes {
     | '/calc'
     | '/sign-in'
     | '/sign-up'
-    | '/pokemon'
-    | '/teams'
-    | '/pokemon/$nameSlug'
-    | '/teams/$teamSlug'
-    | '/pokemon/'
-    | '/teams/'
+    | '/u/$userSlug'
+    | '/u/$userSlug/pokemon'
+    | '/u/$userSlug/t'
+    | '/u/$userSlug/teams'
+    | '/u/$userSlug/pokemon/$nameSlug'
+    | '/u/$userSlug/pokemon/new'
+    | '/u/$userSlug/t/$teamSlug'
+    | '/u/$userSlug/teams/$teamSlug'
+    | '/u/$userSlug/pokemon/'
+    | '/u/$userSlug/t/'
+    | '/u/$userSlug/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,10 +200,14 @@ export interface FileRouteTypes {
     | '/calc'
     | '/sign-in'
     | '/sign-up'
-    | '/pokemon/$nameSlug'
-    | '/teams/$teamSlug'
-    | '/pokemon'
-    | '/teams'
+    | '/u/$userSlug'
+    | '/u/$userSlug/pokemon/$nameSlug'
+    | '/u/$userSlug/pokemon/new'
+    | '/u/$userSlug/t/$teamSlug'
+    | '/u/$userSlug/teams/$teamSlug'
+    | '/u/$userSlug/pokemon'
+    | '/u/$userSlug/t'
+    | '/u/$userSlug/teams'
   id:
     | '__root__'
     | '/'
@@ -157,12 +216,17 @@ export interface FileRouteTypes {
     | '/calc'
     | '/sign-in'
     | '/sign-up'
-    | '/_authenticated/pokemon'
-    | '/_authenticated/teams'
-    | '/_authenticated/pokemon/$nameSlug'
-    | '/_authenticated/teams/$teamSlug'
-    | '/_authenticated/pokemon/'
-    | '/_authenticated/teams/'
+    | '/_authenticated/u/$userSlug'
+    | '/_authenticated/u/$userSlug/pokemon'
+    | '/_authenticated/u/$userSlug/t'
+    | '/_authenticated/u/$userSlug/teams'
+    | '/_authenticated/u/$userSlug/pokemon/$nameSlug'
+    | '/_authenticated/u/$userSlug/pokemon/new'
+    | '/_authenticated/u/$userSlug/t/$teamSlug'
+    | '/_authenticated/u/$userSlug/teams/$teamSlug'
+    | '/_authenticated/u/$userSlug/pokemon/'
+    | '/_authenticated/u/$userSlug/t/'
+    | '/_authenticated/u/$userSlug/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,85 +282,167 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/teams': {
-      id: '/_authenticated/teams'
+    '/_authenticated/u/$userSlug': {
+      id: '/_authenticated/u/$userSlug'
+      path: '/u/$userSlug'
+      fullPath: '/u/$userSlug'
+      preLoaderRoute: typeof AuthenticatedUUserSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/u/$userSlug/teams': {
+      id: '/_authenticated/u/$userSlug/teams'
       path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      fullPath: '/u/$userSlug/teams'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTeamsRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugRoute
     }
-    '/_authenticated/pokemon': {
-      id: '/_authenticated/pokemon'
+    '/_authenticated/u/$userSlug/t': {
+      id: '/_authenticated/u/$userSlug/t'
+      path: '/t'
+      fullPath: '/u/$userSlug/t'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugRoute
+    }
+    '/_authenticated/u/$userSlug/pokemon': {
+      id: '/_authenticated/u/$userSlug/pokemon'
       path: '/pokemon'
-      fullPath: '/pokemon'
-      preLoaderRoute: typeof AuthenticatedPokemonRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      fullPath: '/u/$userSlug/pokemon'
+      preLoaderRoute: typeof AuthenticatedUUserSlugPokemonRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugRoute
     }
-    '/_authenticated/teams/': {
-      id: '/_authenticated/teams/'
+    '/_authenticated/u/$userSlug/teams/': {
+      id: '/_authenticated/u/$userSlug/teams/'
       path: '/'
-      fullPath: '/teams/'
-      preLoaderRoute: typeof AuthenticatedTeamsIndexRouteImport
-      parentRoute: typeof AuthenticatedTeamsRoute
+      fullPath: '/u/$userSlug/teams/'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTeamsIndexRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugTeamsRoute
     }
-    '/_authenticated/pokemon/': {
-      id: '/_authenticated/pokemon/'
+    '/_authenticated/u/$userSlug/t/': {
+      id: '/_authenticated/u/$userSlug/t/'
       path: '/'
-      fullPath: '/pokemon/'
-      preLoaderRoute: typeof AuthenticatedPokemonIndexRouteImport
-      parentRoute: typeof AuthenticatedPokemonRoute
+      fullPath: '/u/$userSlug/t/'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTIndexRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugTRoute
     }
-    '/_authenticated/teams/$teamSlug': {
-      id: '/_authenticated/teams/$teamSlug'
+    '/_authenticated/u/$userSlug/pokemon/': {
+      id: '/_authenticated/u/$userSlug/pokemon/'
+      path: '/'
+      fullPath: '/u/$userSlug/pokemon/'
+      preLoaderRoute: typeof AuthenticatedUUserSlugPokemonIndexRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugPokemonRoute
+    }
+    '/_authenticated/u/$userSlug/teams/$teamSlug': {
+      id: '/_authenticated/u/$userSlug/teams/$teamSlug'
       path: '/$teamSlug'
-      fullPath: '/teams/$teamSlug'
-      preLoaderRoute: typeof AuthenticatedTeamsTeamSlugRouteImport
-      parentRoute: typeof AuthenticatedTeamsRoute
+      fullPath: '/u/$userSlug/teams/$teamSlug'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTeamsTeamSlugRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugTeamsRoute
     }
-    '/_authenticated/pokemon/$nameSlug': {
-      id: '/_authenticated/pokemon/$nameSlug'
+    '/_authenticated/u/$userSlug/t/$teamSlug': {
+      id: '/_authenticated/u/$userSlug/t/$teamSlug'
+      path: '/$teamSlug'
+      fullPath: '/u/$userSlug/t/$teamSlug'
+      preLoaderRoute: typeof AuthenticatedUUserSlugTTeamSlugRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugTRoute
+    }
+    '/_authenticated/u/$userSlug/pokemon/new': {
+      id: '/_authenticated/u/$userSlug/pokemon/new'
+      path: '/new'
+      fullPath: '/u/$userSlug/pokemon/new'
+      preLoaderRoute: typeof AuthenticatedUUserSlugPokemonNewRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugPokemonRoute
+    }
+    '/_authenticated/u/$userSlug/pokemon/$nameSlug': {
+      id: '/_authenticated/u/$userSlug/pokemon/$nameSlug'
       path: '/$nameSlug'
-      fullPath: '/pokemon/$nameSlug'
-      preLoaderRoute: typeof AuthenticatedPokemonNameSlugRouteImport
-      parentRoute: typeof AuthenticatedPokemonRoute
+      fullPath: '/u/$userSlug/pokemon/$nameSlug'
+      preLoaderRoute: typeof AuthenticatedUUserSlugPokemonNameSlugRouteImport
+      parentRoute: typeof AuthenticatedUUserSlugPokemonRoute
     }
   }
 }
 
-interface AuthenticatedPokemonRouteChildren {
-  AuthenticatedPokemonNameSlugRoute: typeof AuthenticatedPokemonNameSlugRoute
-  AuthenticatedPokemonIndexRoute: typeof AuthenticatedPokemonIndexRoute
+interface AuthenticatedUUserSlugPokemonRouteChildren {
+  AuthenticatedUUserSlugPokemonNameSlugRoute: typeof AuthenticatedUUserSlugPokemonNameSlugRoute
+  AuthenticatedUUserSlugPokemonNewRoute: typeof AuthenticatedUUserSlugPokemonNewRoute
+  AuthenticatedUUserSlugPokemonIndexRoute: typeof AuthenticatedUUserSlugPokemonIndexRoute
 }
 
-const AuthenticatedPokemonRouteChildren: AuthenticatedPokemonRouteChildren = {
-  AuthenticatedPokemonNameSlugRoute: AuthenticatedPokemonNameSlugRoute,
-  AuthenticatedPokemonIndexRoute: AuthenticatedPokemonIndexRoute,
+const AuthenticatedUUserSlugPokemonRouteChildren: AuthenticatedUUserSlugPokemonRouteChildren =
+  {
+    AuthenticatedUUserSlugPokemonNameSlugRoute:
+      AuthenticatedUUserSlugPokemonNameSlugRoute,
+    AuthenticatedUUserSlugPokemonNewRoute:
+      AuthenticatedUUserSlugPokemonNewRoute,
+    AuthenticatedUUserSlugPokemonIndexRoute:
+      AuthenticatedUUserSlugPokemonIndexRoute,
+  }
+
+const AuthenticatedUUserSlugPokemonRouteWithChildren =
+  AuthenticatedUUserSlugPokemonRoute._addFileChildren(
+    AuthenticatedUUserSlugPokemonRouteChildren,
+  )
+
+interface AuthenticatedUUserSlugTRouteChildren {
+  AuthenticatedUUserSlugTTeamSlugRoute: typeof AuthenticatedUUserSlugTTeamSlugRoute
+  AuthenticatedUUserSlugTIndexRoute: typeof AuthenticatedUUserSlugTIndexRoute
 }
 
-const AuthenticatedPokemonRouteWithChildren =
-  AuthenticatedPokemonRoute._addFileChildren(AuthenticatedPokemonRouteChildren)
+const AuthenticatedUUserSlugTRouteChildren: AuthenticatedUUserSlugTRouteChildren =
+  {
+    AuthenticatedUUserSlugTTeamSlugRoute: AuthenticatedUUserSlugTTeamSlugRoute,
+    AuthenticatedUUserSlugTIndexRoute: AuthenticatedUUserSlugTIndexRoute,
+  }
 
-interface AuthenticatedTeamsRouteChildren {
-  AuthenticatedTeamsTeamSlugRoute: typeof AuthenticatedTeamsTeamSlugRoute
-  AuthenticatedTeamsIndexRoute: typeof AuthenticatedTeamsIndexRoute
+const AuthenticatedUUserSlugTRouteWithChildren =
+  AuthenticatedUUserSlugTRoute._addFileChildren(
+    AuthenticatedUUserSlugTRouteChildren,
+  )
+
+interface AuthenticatedUUserSlugTeamsRouteChildren {
+  AuthenticatedUUserSlugTeamsTeamSlugRoute: typeof AuthenticatedUUserSlugTeamsTeamSlugRoute
+  AuthenticatedUUserSlugTeamsIndexRoute: typeof AuthenticatedUUserSlugTeamsIndexRoute
 }
 
-const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
-  AuthenticatedTeamsTeamSlugRoute: AuthenticatedTeamsTeamSlugRoute,
-  AuthenticatedTeamsIndexRoute: AuthenticatedTeamsIndexRoute,
+const AuthenticatedUUserSlugTeamsRouteChildren: AuthenticatedUUserSlugTeamsRouteChildren =
+  {
+    AuthenticatedUUserSlugTeamsTeamSlugRoute:
+      AuthenticatedUUserSlugTeamsTeamSlugRoute,
+    AuthenticatedUUserSlugTeamsIndexRoute:
+      AuthenticatedUUserSlugTeamsIndexRoute,
+  }
+
+const AuthenticatedUUserSlugTeamsRouteWithChildren =
+  AuthenticatedUUserSlugTeamsRoute._addFileChildren(
+    AuthenticatedUUserSlugTeamsRouteChildren,
+  )
+
+interface AuthenticatedUUserSlugRouteChildren {
+  AuthenticatedUUserSlugPokemonRoute: typeof AuthenticatedUUserSlugPokemonRouteWithChildren
+  AuthenticatedUUserSlugTRoute: typeof AuthenticatedUUserSlugTRouteWithChildren
+  AuthenticatedUUserSlugTeamsRoute: typeof AuthenticatedUUserSlugTeamsRouteWithChildren
 }
 
-const AuthenticatedTeamsRouteWithChildren =
-  AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
+const AuthenticatedUUserSlugRouteChildren: AuthenticatedUUserSlugRouteChildren =
+  {
+    AuthenticatedUUserSlugPokemonRoute:
+      AuthenticatedUUserSlugPokemonRouteWithChildren,
+    AuthenticatedUUserSlugTRoute: AuthenticatedUUserSlugTRouteWithChildren,
+    AuthenticatedUUserSlugTeamsRoute:
+      AuthenticatedUUserSlugTeamsRouteWithChildren,
+  }
+
+const AuthenticatedUUserSlugRouteWithChildren =
+  AuthenticatedUUserSlugRoute._addFileChildren(
+    AuthenticatedUUserSlugRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedPokemonRoute: typeof AuthenticatedPokemonRouteWithChildren
-  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
+  AuthenticatedUUserSlugRoute: typeof AuthenticatedUUserSlugRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedPokemonRoute: AuthenticatedPokemonRouteWithChildren,
-  AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
+  AuthenticatedUUserSlugRoute: AuthenticatedUUserSlugRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

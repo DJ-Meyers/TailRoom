@@ -4,12 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { TeamCalcView } from '~/components/TeamCalcView';
 import { useTRPC } from '~/trpc/client';
 
-export const Route = createFileRoute('/_authenticated/pokemon/$nameSlug')({
+export const Route = createFileRoute('/_authenticated/u/$userSlug/pokemon/$nameSlug')({
   component: PokemonDetailPage,
 });
 
 function PokemonDetailPage() {
-  const { nameSlug } = Route.useParams();
+  const { userSlug, nameSlug } = Route.useParams();
   const navigate = useNavigate();
   const trpc = useTRPC();
 
@@ -26,7 +26,7 @@ function PokemonDetailPage() {
       <div className="text-center">
         <p className="text-text-muted mb-4">Pokémon not found.</p>
         <button
-          onClick={() => navigate({ to: '/pokemon' })}
+          onClick={() => navigate({ to: '/u/$userSlug/pokemon', params: { userSlug } })}
           className="text-primary hover:underline"
         >
           Back to pokémon
@@ -39,7 +39,7 @@ function PokemonDetailPage() {
     <div className="max-w-[1400px] mx-auto">
       <div className="flex items-center justify-center gap-3 mb-6">
         <button
-          onClick={() => navigate({ to: '/pokemon' })}
+          onClick={() => navigate({ to: '/u/$userSlug/pokemon', params: { userSlug } })}
           className="text-text-muted hover:text-text"
         >
           &larr; Pokémon

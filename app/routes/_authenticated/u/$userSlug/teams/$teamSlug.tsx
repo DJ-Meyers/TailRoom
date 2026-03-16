@@ -6,12 +6,12 @@ import { useState } from 'react';
 import { TeamCalcView } from '~/components/TeamCalcView';
 import { useTRPC } from '~/trpc/client';
 
-export const Route = createFileRoute('/_authenticated/teams/$teamSlug')({
+export const Route = createFileRoute('/_authenticated/u/$userSlug/teams/$teamSlug')({
   component: TeamDetailPage,
 });
 
 function TeamDetailPage() {
-  const { teamSlug } = Route.useParams();
+  const { userSlug, teamSlug } = Route.useParams();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -37,7 +37,11 @@ function TeamDetailPage() {
         queryClient.invalidateQueries({ queryKey: trpc.team.getBySlug.queryKey({ slug: teamSlug }) });
         setEditingName(false);
         if (updated && updated.slug !== teamSlug) {
-          navigate({ to: '/teams/$teamSlug', params: { teamSlug: updated.slug }, replace: true });
+          navigate({
+            to: '/u/$userSlug/teams/$teamSlug',
+            params: { userSlug, teamSlug: updated.slug },
+            replace: true,
+          });
         }
       },
     }),
@@ -63,7 +67,7 @@ function TeamDetailPage() {
       <div className="text-center">
         <p className="text-text-muted mb-4">Team not found.</p>
         <button
-          onClick={() => navigate({ to: '/teams' })}
+          onClick={() => navigate({ to: '/u/$userSlug/teams', params: { userSlug } })}
           className="text-primary hover:underline"
         >
           Back to teams
@@ -101,7 +105,7 @@ function TeamDetailPage() {
       {/* Team header */}
       <div className="flex items-center justify-center gap-3 mb-6">
         <button
-          onClick={() => navigate({ to: '/teams' })}
+          onClick={() => navigate({ to: '/u/$userSlug/teams', params: { userSlug } })}
           className="text-text-muted hover:text-text"
         >
           &larr; Teams

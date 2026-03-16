@@ -3,11 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useTRPC } from '~/trpc/client';
 
-export const Route = createFileRoute('/_authenticated/pokemon/')({
+export const Route = createFileRoute('/_authenticated/u/$userSlug/pokemon/')({
   component: PokemonListPage,
 });
 
 function PokemonListPage() {
+  const { userSlug } = Route.useParams();
   const trpc = useTRPC();
   const { data: allPokemon, isPending } = useQuery(
     trpc.pokemon.listAll.queryOptions(),
@@ -32,8 +33,8 @@ function PokemonListPage() {
             >
               <div className="flex items-center gap-3">
                 <Link
-                  to="/pokemon/$nameSlug"
-                  params={{ nameSlug: poke.slug }}
+                  to="/u/$userSlug/pokemon/$nameSlug"
+                  params={{ userSlug, nameSlug: poke.slug }}
                   className="text-lg text-primary hover:underline"
                 >
                   {poke.name || poke.species || 'Unnamed'}
@@ -49,8 +50,8 @@ function PokemonListPage() {
                   used on:{' '}
                   {pokeTeams.length === 1 ? (
                     <Link
-                      to="/teams/$teamSlug"
-                      params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                      to="/u/$userSlug/teams/$teamSlug"
+                      params={{ userSlug, teamSlug: pokeTeams[0]!.teamSlug }}
                       className="hover:text-text"
                     >
                       {pokeTeams[0]!.teamName}
@@ -58,16 +59,16 @@ function PokemonListPage() {
                   ) : pokeTeams.length === 2 ? (
                     <>
                       <Link
-                        to="/teams/$teamSlug"
-                        params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                        to="/u/$userSlug/teams/$teamSlug"
+                        params={{ userSlug, teamSlug: pokeTeams[0]!.teamSlug }}
                         className="hover:text-text"
                       >
                         {pokeTeams[0]!.teamName}
                       </Link>
                       {' and '}
                       <Link
-                        to="/teams/$teamSlug"
-                        params={{ teamSlug: pokeTeams[1]!.teamSlug }}
+                        to="/u/$userSlug/teams/$teamSlug"
+                        params={{ userSlug, teamSlug: pokeTeams[1]!.teamSlug }}
                         className="hover:text-text"
                       >
                         {pokeTeams[1]!.teamName}
@@ -76,16 +77,16 @@ function PokemonListPage() {
                   ) : (
                     <>
                       <Link
-                        to="/teams/$teamSlug"
-                        params={{ teamSlug: pokeTeams[0]!.teamSlug }}
+                        to="/u/$userSlug/teams/$teamSlug"
+                        params={{ userSlug, teamSlug: pokeTeams[0]!.teamSlug }}
                         className="hover:text-text"
                       >
                         {pokeTeams[0]!.teamName}
                       </Link>
                       {', '}
                       <Link
-                        to="/teams/$teamSlug"
-                        params={{ teamSlug: pokeTeams[1]!.teamSlug }}
+                        to="/u/$userSlug/teams/$teamSlug"
+                        params={{ userSlug, teamSlug: pokeTeams[1]!.teamSlug }}
                         className="hover:text-text"
                       >
                         {pokeTeams[1]!.teamName}

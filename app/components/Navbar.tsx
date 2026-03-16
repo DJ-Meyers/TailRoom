@@ -1,8 +1,17 @@
 import { useUser } from '@clerk/react'
 import { Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+
+import { useTRPC } from '~/trpc/client'
 
 export function Navbar() {
   const { user } = useUser()
+  const trpc = useTRPC()
+  const devBypass = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+  const { data: me } = useQuery({
+    ...trpc.user.me.queryOptions(),
+    enabled: !!user || devBypass,
+  })
 
   return (
     <nav className="flex items-center gap-6 mb-6 pb-3 border-b border-border">
@@ -11,20 +20,31 @@ export function Navbar() {
       </Link>
 
       <div className="flex items-center gap-4">
-        <Link
-          to="/teams"
-          className="text-text-muted hover:text-text no-underline [&.active]:text-primary"
-          activeProps={{ className: 'active text-primary' }}
-        >
-          Teams
-        </Link>
-        <Link
-          to="/pokemon"
-          className="text-text-muted hover:text-text no-underline [&.active]:text-primary"
-          activeProps={{ className: 'active text-primary' }}
-        >
-          Pokémon
-        </Link>
+        {me ? (
+          <>
+            <Link
+              to="/u/$userSlug/teams"
+              params={{ userSlug: me.slug }}
+              className="text-text-muted hover:text-text no-underline [&.active]:text-primary"
+              activeProps={{ className: 'active text-primary' }}
+            >
+              Teams
+            </Link>
+            <Link
+              to="/u/$userSlug/pokemon"
+              params={{ userSlug: me.slug }}
+              className="text-text-muted hover:text-text no-underline [&.active]:text-primary"
+              activeProps={{ className: 'active text-primary' }}
+            >
+              Pokémon
+            </Link>
+          </>
+        ) : (
+          <>
+            <span className="text-text-muted">Teams</span>
+            <span className="text-text-muted">Pokémon</span>
+          </>
+        )}
       </div>
 
       <div className="ml-auto">
