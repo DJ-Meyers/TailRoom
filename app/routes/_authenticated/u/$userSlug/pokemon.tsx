@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_authenticated/pokemon')({
+export const Route = createFileRoute('/_authenticated/u/$userSlug/pokemon')({
   component: PokemonLayout,
 });
 
