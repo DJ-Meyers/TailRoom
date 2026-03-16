@@ -4,13 +4,52 @@ import { eq } from 'drizzle-orm';
 import { db } from './index';
 import { calcEntries, pokemon, speedEntries, teamPokemon, teams } from './schema';
 
-const userId = process.env.SEED_USER_ID ?? 'dev_local_user';
+async function resolveUserId(): Promise<string> {
+  if (process.env.SEED_USER_ID) {
+    return process.env.SEED_USER_ID;
+  }
+
+  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkSecretKey) {
+    console.error(
+      'Error: No SEED_USER_ID set and no CLERK_SECRET_KEY available to look up users.\n' +
+        'Set SEED_USER_ID in your .env to your Clerk user ID.',
+    );
+    process.exit(1);
+  }
+
+  console.log('No SEED_USER_ID set. Looking up Clerk users...');
+  const res = await fetch('https://api.clerk.com/v1/users?limit=1', {
+    headers: { Authorization: `Bearer ${clerkSecretKey}` },
+  });
+
+  if (!res.ok) {
+    console.error(`Failed to fetch Clerk users: ${res.status} ${res.statusText}`);
+    process.exit(1);
+  }
+
+  const users = (await res.json()) as Array<{ id: string; username: string | null }>;
+  if (users.length === 0) {
+    console.error(
+      'No users found in Clerk. Sign in to the app first, then re-run the seed.',
+    );
+    process.exit(1);
+  }
+
+  const user = users[0];
+  console.log(
+    `  Using Clerk user: ${user.username ?? user.id} (${user.id})`,
+  );
+  return user.id;
+}
 
 const defaultEvs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 const defaultIvs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
 const defaultBoosts = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 
 async function seed() {
+  const userId = await resolveUserId();
+
   // Idempotency check
   const existing = await db
     .select()
