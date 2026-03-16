@@ -3,11 +3,14 @@ import { eq } from 'drizzle-orm';
 import { users } from '~/db/schema';
 import { protectedProcedure, router } from '~/trpc/init';
 
-function slugFromClerkId(clerkId: string): string {
-  // Clerk IDs look like "user_2NNEqL2nrIRdJ194ndJqAHwEfxC"
-  // Strip the "user_" prefix and take a short, URL-friendly segment
-  const raw = clerkId.startsWith('user_') ? clerkId.slice(5) : clerkId;
-  return raw.slice(0, 12).toLowerCase();
+function generateSlug(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let slug = '';
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  for (const b of bytes) {
+    slug += chars[b % chars.length];
+  }
+  return slug;
 }
 
 export const userRouter = router({
@@ -19,27 +22,24 @@ export const userRouter = router({
 
     if (existing) return existing;
 
-    const slug = slugFromClerkId(ctx.userId);
+    const slug = generateSlug();
     const [created] = await ctx.db
       .insert(users)
       .values({ clerkId: ctx.userId, slug })
       .onConflictDoNothing()
       .returning();
 
-    // If onConflictDoNothing didn't insert (slug collision), retry with suffix
+    // If onConflictDoNothing didn't insert (slug collision), retry with a new slug
     if (!created) {
-      let candidate = slug;
-      let suffix = 2;
-      while (true) {
-        candidate = `${slug}-${suffix}`;
+      for (let attempt = 0; attempt < 5; attempt++) {
         const [retry] = await ctx.db
           .insert(users)
-          .values({ clerkId: ctx.userId, slug: candidate })
+          .values({ clerkId: ctx.userId, slug: generateSlug() })
           .onConflictDoNothing()
           .returning();
         if (retry) return retry;
-        suffix++;
       }
+      throw new Error('Failed to generate unique slug after multiple attempts');
     }
 
     return created;
