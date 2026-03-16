@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
 import { useTRPC } from '~/trpc/client';
@@ -9,6 +9,7 @@ export const Route = createFileRoute('/_authenticated/u/$userSlug/pokemon/')({
 
 function PokemonListPage() {
   const { userSlug } = Route.useParams();
+  const navigate = useNavigate();
   const trpc = useTRPC();
   const { data: allPokemon, isPending } = useQuery(
     trpc.pokemon.listAll.queryOptions(),
@@ -16,7 +17,15 @@ function PokemonListPage() {
 
   return (
     <div className="max-w-[800px] mx-auto">
-      <h1 className="text-center mb-6 text-3xl">My Pokémon</h1>
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <h1 className="text-3xl">My Pokémon</h1>
+        <button
+          onClick={() => navigate({ to: '/u/$userSlug/pokemon/new', params: { userSlug } })}
+          className="px-4 py-2 rounded bg-primary text-white hover:bg-primary-hover"
+        >
+          New Pokémon
+        </button>
+      </div>
 
       {isPending ? (
         <p className="text-center text-text-muted">Loading pokémon...</p>
