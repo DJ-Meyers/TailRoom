@@ -8,7 +8,7 @@ const devBypass = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH ==
 
 function Logo({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 64 64" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <defs>
         <clipPath id="logo-right-circle">
           <rect x="-10" y="-10" width="52" height="84"/>
