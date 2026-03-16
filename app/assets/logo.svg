@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <clipPath id="right-circle">
+      <!-- Left side open for wind curls -->
+      <rect x="-10" y="-10" width="48" height="84"/>
+      <!-- Circle clips the right side -->
+      <circle cx="32" cy="28" r="32"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#right-circle)">
+    <!-- Wind curves extending full width — these are the horizontal grid lines -->
+    <g stroke-width="2.5">
+      <!-- Top wind line (y=18, curl up-left) -->
+      <path d="M72 18 H30 q-10 0 -10 -7 q0 -7 7 -7 q5 0 5 5"/>
+      <!-- Middle wind line (y=28, curl up-left, longest reach) -->
+      <path d="M72 28 H14 q-12 0 -12 -8 q0 -7 7 -7 q5 0 5 5"/>
+      <!-- Bottom wind line (y=38, curl down-left) -->
+      <path d="M72 38 H22 q-9 0 -9 7 q0 7 7 7 q5 0 5 -5"/>
+    </g>
+
+    <!-- Grid: vertical lines, fan lines, and extra horizontals -->
+    <g stroke-width="2">
+      <!-- Extra horizontal above wind (y=8, starts at first vertical) -->
+      <line x1="40" y1="8" x2="72" y2="8"/>
+
+      <!-- Vertical lines (cross top and middle wind lines) -->
+      <line x1="40" y1="-4" x2="40" y2="28"/>
+      <line x1="52" y1="-4" x2="52" y2="28"/>
+
+      <!-- Fanning diagonal lines from horizon downward (cross bottom wind line) -->
+      <line x1="40" y1="28" x2="54" y2="64"/>
+      <line x1="52" y1="28" x2="100" y2="64"/>
+
+      <!-- Extra horizontal below wind (y=48, starts at first fan line) -->
+      <line x1="48" y1="48" x2="72" y2="48"/>
+    </g>
+  </g>
+</svg>
