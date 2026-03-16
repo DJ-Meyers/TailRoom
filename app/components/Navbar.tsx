@@ -4,10 +4,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { useTRPC } from '~/trpc/client'
 
+const devBypass = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
 export function Navbar() {
   const { user } = useUser()
   const trpc = useTRPC()
-  const devBypass = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
   const { data: me } = useQuery({
     ...trpc.user.me.queryOptions(),
     enabled: !!user || devBypass,
