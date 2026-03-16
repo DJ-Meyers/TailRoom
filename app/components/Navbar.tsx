@@ -11,7 +11,7 @@ function Logo({ className }: { className?: string }) {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 64 64" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <defs>
         <clipPath id="logo-right-circle">
-          <rect x="-10" y="-10" width="52" height="84"/>
+          <rect x="-10" y="-10" width="48" height="84"/>
           <circle cx="32" cy="28" r="32"/>
         </clipPath>
       </defs>

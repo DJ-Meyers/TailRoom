@@ -2,7 +2,7 @@
   <defs>
     <clipPath id="right-circle">
       <!-- Left side open for wind curls -->
-      <rect x="-10" y="-10" width="52" height="84"/>
+      <rect x="-10" y="-10" width="48" height="84"/>
       <!-- Circle clips the right side -->
       <circle cx="32" cy="28" r="32"/>
     </clipPath>
