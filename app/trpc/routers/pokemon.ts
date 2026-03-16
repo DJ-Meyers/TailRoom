@@ -36,32 +36,49 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
+function randomAlphanumeric(length: number): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+function generatePokemonSlug(name: string, species: string): string {
+  if (name) return slugify(name);
+  const prefix = slugify(species).slice(0, 4) || 'pkmn';
+  return `${prefix}-${randomAlphanumeric(4)}`;
+}
+
 async function uniquePokemonSlug(
   db: typeof import('~/db').db,
   userId: string,
   name: string,
+  species: string,
   excludeId?: string,
 ): Promise<string> {
-  const base = slugify(name) || 'pokemon';
-  let candidate = base;
-  let suffix = 2;
+  let candidate = generatePokemonSlug(name, species);
+  let attempts = 0;
 
   while (true) {
-    const conditions = [
-      eq(pokemon.userId, userId),
-      eq(pokemon.slug, candidate),
-    ];
-
     const [existing] = await db
       .select({ id: pokemon.id })
       .from(pokemon)
-      .where(and(...conditions));
+      .where(and(eq(pokemon.userId, userId), eq(pokemon.slug, candidate)));
 
     if (!existing || (excludeId && existing.id === excludeId)) {
       return candidate;
     }
-    candidate = `${base}-${suffix}`;
-    suffix++;
+
+    // On collision: if name-based, append incrementing suffix; if generated, regenerate
+    if (name) {
+      attempts++;
+      candidate = `${slugify(name)}-${attempts + 1}`;
+    } else {
+      const prefix = slugify(species).slice(0, 4) || 'pkmn';
+      candidate = `${prefix}-${randomAlphanumeric(4)}`;
+    }
   }
 }
 
@@ -173,7 +190,7 @@ export const pokemonRouter = router({
       z.object({
         teamId: z.string().uuid().optional(),
         slot: z.number().int().min(0).max(5).optional(),
-        species: z.string().optional(),
+        species: z.string().min(1, 'Species is required'),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -188,14 +205,13 @@ export const pokemonRouter = router({
         if (!team) throw new Error('Team not found');
       }
 
-      const slugBase = input.species || 'pokemon';
-      const slug = await uniquePokemonSlug(ctx.db, ctx.userId, slugBase);
+      const slug = await uniquePokemonSlug(ctx.db, ctx.userId, '', input.species);
 
       const [row] = await ctx.db
         .insert(pokemon)
         .values({
           userId: ctx.userId,
-          species: input.species ?? '',
+          species: input.species,
           slug,
         })
         .returning();
@@ -226,10 +242,9 @@ export const pokemonRouter = router({
           .select({ name: pokemon.name, species: pokemon.species })
           .from(pokemon)
           .where(eq(pokemon.id, id));
-        const newName = data.name ?? current?.name;
-        const newSpecies = data.species ?? current?.species;
-        const slugBase = newName || newSpecies || 'pokemon';
-        const slug = await uniquePokemonSlug(ctx.db, ctx.userId, slugBase, id);
+        const newName = data.name ?? current?.name ?? '';
+        const newSpecies = data.species ?? current?.species ?? '';
+        const slug = await uniquePokemonSlug(ctx.db, ctx.userId, newName, newSpecies, id);
         Object.assign(data, { slug });
       }
 
