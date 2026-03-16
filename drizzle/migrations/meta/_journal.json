@@ -36,6 +36,13 @@
       "when": 1773800000000,
       "tag": "0004_team_name_varchar_24",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773635324702,
+      "tag": "0005_add_users_table",
+      "breakpoints": true
     }
   ]
 }

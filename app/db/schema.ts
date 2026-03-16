@@ -12,6 +12,12 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+export const users = pgTable('users', {
+  clerkId: text('clerk_id').primaryKey(),
+  slug: text().notNull().unique(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+});
+
 export const teams = pgTable(
   'teams',
   {
