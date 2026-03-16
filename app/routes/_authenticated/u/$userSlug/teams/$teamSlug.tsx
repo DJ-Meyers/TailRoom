@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { PokemonSelector } from '~/components/PokemonSelector';
 import { TeamCalcView } from '~/components/TeamCalcView';
 import { useTRPC } from '~/trpc/client';
 
@@ -28,6 +29,7 @@ function TeamDetailPage() {
   });
 
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const [addingSlot, setAddingSlot] = useState<number | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
 
@@ -54,6 +56,7 @@ function TeamDetailPage() {
           queryKey: trpc.pokemon.listByTeam.queryKey({ teamId: teamId! }),
         });
         setSelectedSlot(variables.slot ?? null);
+        setAddingSlot(null);
       },
     }),
   );
@@ -96,8 +99,8 @@ function TeamDetailPage() {
     }
   };
 
-  const handleAddPokemon = (slot: number) => {
-    createPokemonMutation.mutate({ teamId: team.id, slot });
+  const handleAddPokemon = (slot: number, species: string) => {
+    createPokemonMutation.mutate({ teamId: team.id, slot, species });
   };
 
   return (
@@ -147,12 +150,14 @@ function TeamDetailPage() {
               onClick={() => {
                 if (poke) {
                   setSelectedSlot(slot);
+                  setAddingSlot(null);
                 } else {
-                  handleAddPokemon(slot);
+                  setAddingSlot(slot);
+                  setSelectedSlot(null);
                 }
               }}
               className={`px-4 py-2 rounded border transition-colors ${
-                isSelected
+                isSelected || addingSlot === slot
                   ? 'border-primary bg-primary/20 text-primary'
                   : 'border-border bg-surface text-text hover:border-primary-hover'
               }`}
@@ -162,6 +167,24 @@ function TeamDetailPage() {
           );
         })}
       </div>
+
+      {/* Species picker for new pokemon */}
+      {addingSlot !== null && (
+        <div className="max-w-xs mx-auto mb-6">
+          <p className="text-sm text-text-muted mb-2 text-center">Choose a species for slot {addingSlot + 1}</p>
+          <PokemonSelector
+            id={`add-slot-${addingSlot}`}
+            value=""
+            onChange={(species) => handleAddPokemon(addingSlot, species)}
+          />
+          <button
+            onClick={() => setAddingSlot(null)}
+            className="mt-2 w-full text-sm text-text-muted hover:text-text"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       {/* Team calc view for selected pokemon */}
       {selectedPokemon ? (
