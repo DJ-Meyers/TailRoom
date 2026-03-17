@@ -1,12 +1,12 @@
-import { toID } from '@smogon/calc';
 import { useState } from 'react';
+import { toSpriteId } from '~/data/spriteNames';
 
-const SPRITE_BASE = 'https://play.pokemonshowdown.com/sprites/home';
+const SPRITE_BASE = 'https://play.pokemonshowdown.com/sprites/home-centered';
+const FALLBACK_SRC = `${SPRITE_BASE}/ditto.png`;
 
 export const PokemonIcon = ({ species, className }: { species: string; className?: string }) => {
   const [failed, setFailed] = useState(false);
-  if (failed) return <>{species}</>;
-  const src = `${SPRITE_BASE}/${toID(species)}.png`;
+  const src = failed ? FALLBACK_SRC : `${SPRITE_BASE}/${toSpriteId(species)}.png`;
   return (
     <span className={className ?? "relative inline-block w-[1.8em] h-[1.4em] overflow-hidden align-middle"}>
       <img

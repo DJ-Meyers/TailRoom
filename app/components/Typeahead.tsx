@@ -131,7 +131,7 @@ export const Typeahead = ({
         className="w-full px-2 py-1.5 border border-border rounded text-sm bg-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
       {open && (
-        <ul className="absolute z-10 left-0 right-0 max-h-[200px] overflow-y-auto list-none bg-surface border border-border border-t-0 rounded-b shadow-md" ref={listRef}>
+        <ul className="absolute z-20 left-0 right-0 max-h-[200px] overflow-y-auto list-none bg-surface border border-border border-t-0 rounded-b shadow-md" ref={listRef}>
           {allItems.length === 0 && (
             <li className="px-2 py-1 text-sm text-text-dim italic cursor-default">No matches</li>
           )}
