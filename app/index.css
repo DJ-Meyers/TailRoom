@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #343434;
-  --color-surface: #5b6264;
-  --color-surface-hover: #6d7476;
-  --color-text: #eae8e5;
-  --color-text-muted: #cecece;
-  --color-primary: #ff8935;
-  --color-primary-hover: #e07528;
-  --color-accent: #f4a638;
+  --color-bg: #001428;
+  --color-surface: #002040;
+  --color-surface-hover: #003060;
+  --color-text: #e8edf2;
+  --color-text-muted: #8ea8c4;
+  --color-primary: #ff8c00;
+  --color-primary-hover: #ff7000;
+  --color-accent: #ff4500;
   --color-error: #d43030;
   --breakpoint-md: 800px;
   --color-border: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
@@ -41,14 +41,14 @@ body {
 
 /* Light mode overrides — toggled via data-mode="light" on <html> */
 [data-mode="light"] {
-  --color-bg: #eae8e5;
+  --color-bg: #f0f4f8;
   --color-surface: #ffffff;
-  --color-surface-hover: #dddbd8;
-  --color-text: #343434;
-  --color-text-muted: #5b6264;
-  --color-primary: #e07528;
-  --color-primary-hover: #c86820;
-  --color-accent: #d89420;
+  --color-surface-hover: #dce4ec;
+  --color-text: #001a33;
+  --color-text-muted: #003060;
+  --color-primary: #e07800;
+  --color-primary-hover: #c86800;
+  --color-accent: #e03d00;
   --color-error: #c83030;
   color-scheme: light;
 }

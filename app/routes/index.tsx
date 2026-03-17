@@ -188,29 +188,7 @@ function IndexPage() {
           >
             Get Started
           </Link>
-          <Link
-            to="/calc"
-            className="px-5 py-2 rounded border border-border text-text hover:bg-surface no-underline"
-          >
-            Quick Calc
-          </Link>
         </div>
-      </section>
-
-      {/* Features */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-[900px] mx-auto">
-        <FeatureCard
-          title="Build Teams"
-          description="Organize your Pokemon into teams and fine-tune EV spreads with instant damage feedback."
-        />
-        <FeatureCard
-          title="Save Your Calcs"
-          description="Offensive, defensive, and speed calcs are saved per-Pokemon so you never lose your work."
-        />
-        <FeatureCard
-          title="Share With Friends"
-          description="Export and share your teams and calcs with your practice group or the community."
-        />
       </section>
 
       {/* Sandbox */}
@@ -220,7 +198,7 @@ function IndexPage() {
           Wolfe&apos;s Incineroar &mdash; adjust the spread and calcs below
         </p>
 
-        <div className="flex gap-6 items-start mb-6 max-md:flex-col">
+        <div className="flex gap-6 items-start max-md:flex-col mb-6">
           <div className="flex-1 min-w-0">
             <PokemonPanel
               label="Your Pokemon"
@@ -242,24 +220,22 @@ function IndexPage() {
               onParsed={handleSelectedPokemonParsed}
             />
           </div>
-          <div className="flex-1 min-w-0">
-            <SpeedColumn
-              entries={speed.entries}
-              selectedPokemon={selectedPokemon.state}
-              conditions={speed.conditions}
-              onConditionsChange={speed.setConditions}
-              onAdd={speed.add}
-              onRemove={speed.remove}
-              onToggleExpanded={speed.toggleExpanded}
-              onSpeciesChange={speed.setSpecies}
-              onPokemonUpdate={speed.updatePokemon}
-              onEvChange={speed.setEv}
-              onIvChange={speed.setIv}
-              onBoostChange={speed.setBoost}
-              onNameChange={speed.updateName}
-              onNotesChange={speed.updateNotes}
-            />
-          </div>
+          <SpeedColumn
+            entries={speed.entries}
+            selectedPokemon={selectedPokemon.state}
+            conditions={speed.conditions}
+            onConditionsChange={speed.setConditions}
+            onAdd={speed.add}
+            onRemove={speed.remove}
+            onToggleExpanded={speed.toggleExpanded}
+            onSpeciesChange={speed.setSpecies}
+            onPokemonUpdate={speed.updatePokemon}
+            onEvChange={speed.setEv}
+            onIvChange={speed.setIv}
+            onBoostChange={speed.setBoost}
+            onNameChange={speed.updateName}
+            onNotesChange={speed.updateNotes}
+          />
         </div>
         <div className="flex gap-6 items-start max-md:flex-col">
           <CalcColumn
@@ -304,15 +280,6 @@ function IndexPage() {
           />
         </div>
       </section>
-    </div>
-  )
-}
-
-function FeatureCard({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="p-5 rounded-lg bg-surface text-center">
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-sm text-text-muted">{description}</p>
     </div>
   )
 }
