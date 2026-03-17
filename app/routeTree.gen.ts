@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as CalcRouteImport } from './routes/calc'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -35,11 +34,6 @@ const SignUpRoute = SignUpRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CalcRoute = CalcRouteImport.update({
-  id: '/calc',
-  path: '/calc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -124,7 +118,6 @@ const AuthenticatedUUserSlugPokemonNameSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
@@ -142,7 +135,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
@@ -159,7 +151,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/account': typeof AccountRoute
-  '/calc': typeof CalcRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/_authenticated/u/$userSlug': typeof AuthenticatedUUserSlugRouteWithChildren
@@ -179,7 +170,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
-    | '/calc'
     | '/sign-in'
     | '/sign-up'
     | '/u/$userSlug'
@@ -197,7 +187,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
-    | '/calc'
     | '/sign-in'
     | '/sign-up'
     | '/u/$userSlug'
@@ -213,7 +202,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/account'
-    | '/calc'
     | '/sign-in'
     | '/sign-up'
     | '/_authenticated/u/$userSlug'
@@ -233,7 +221,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccountRoute: typeof AccountRoute
-  CalcRoute: typeof CalcRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
 }
@@ -252,13 +239,6 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calc': {
-      id: '/calc'
-      path: '/calc'
-      fullPath: '/calc'
-      preLoaderRoute: typeof CalcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -453,7 +433,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccountRoute: AccountRoute,
-  CalcRoute: CalcRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
 }

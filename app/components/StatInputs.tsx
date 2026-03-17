@@ -39,7 +39,7 @@ export const StatInputs = ({ species, nature, level, evs, ivs, boosts, hideBoost
         EVs: {totalEvs} / {MAX_TOTAL_EVS}
       </div>
       <div className="flex items-center gap-1.5 mb-1 text-[0.7rem] font-semibold text-text-dim">
-        <span className="w-16" />
+        <span className="w-8" />
         <span className="w-14 text-center">EV</span>
         <span className="w-12 text-center">IV</span>
         {!hideBoosts && <span className="w-14 text-center">Boost</span>}
@@ -49,8 +49,8 @@ export const StatInputs = ({ species, nature, level, evs, ivs, boosts, hideBoost
         const canBoost = BOOSTABLE_STATS.includes(stat);
         return (
           <div key={stat} className="flex items-center gap-1.5 mb-1 flex-1">
-            <span className="w-16 text-xs font-semibold text-text-label">
-              {STAT_LABELS[stat]}{rawStats ? ` ${rawStats[stat]}` : ''}
+            <span className="w-8 text-xs font-semibold text-text-label">
+              {STAT_LABELS[stat]}
             </span>
             <input
               type="number"

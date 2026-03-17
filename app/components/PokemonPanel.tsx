@@ -87,9 +87,9 @@ export const PokemonPanel = ({
         />
       )}
       <ParseInput onParsed={onParsed} label={id} parseContext={parseContext} />
-      <div className="flex gap-4 max-md:flex-col">
+      <div className="flex gap-4 max-sm:flex-col">
         <div className="flex-1 min-w-0">
-          <div className="grid grid-cols-2 gap-x-3">
+          <div className="flex flex-col">
             <PokemonSelector
               id={`${id}-species`}
               value={state.species}
