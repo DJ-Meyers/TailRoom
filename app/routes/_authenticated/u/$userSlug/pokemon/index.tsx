@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
+import { PokemonIcon } from '~/components/PokemonIcon';
 import { useTRPC } from '~/trpc/client';
+import type { StatsTable } from '~/types';
 
 export const Route = createFileRoute('/_authenticated/u/$userSlug/pokemon/')({
   component: PokemonListPage,
@@ -40,19 +42,33 @@ function PokemonListPage() {
               key={poke.id}
               className="flex items-center justify-between p-4 rounded bg-surface border border-border"
             >
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/u/$userSlug/pokemon/$nameSlug"
-                  params={{ userSlug, nameSlug: poke.slug }}
-                  className="text-lg text-primary hover:underline"
-                >
-                  {poke.name || poke.species || 'Unnamed'}
-                </Link>
-                {poke.species && poke.name && poke.name !== poke.species && (
-                  <span className="text-sm text-text-muted">
-                    ({poke.species})
-                  </span>
-                )}
+              <div className="flex items-center gap-2">
+              {poke.species && (
+                <PokemonIcon species={poke.species} className="relative w-[48px] shrink-0 self-stretch" />
+              )}
+              <div>
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/u/$userSlug/pokemon/$nameSlug"
+                    params={{ userSlug, nameSlug: poke.slug }}
+                    className="text-lg text-primary hover:underline"
+                  >
+                    {poke.name || poke.species || 'Unnamed'}
+                  </Link>
+                  {poke.species && poke.name && poke.name !== poke.species && (
+                    <span className="text-sm text-text-muted">
+                      ({poke.species})
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-text-muted">
+                  {poke.nature}{' '}
+                  {(() => {
+                    const evs = poke.evs as StatsTable;
+                    return `${evs.hp}/${evs.atk}/${evs.def}/${evs.spa}/${evs.spd}/${evs.spe}`;
+                  })()}
+                </div>
+              </div>
               </div>
               {pokeTeams.length > 0 && (
                 <div className="text-sm text-text-muted">

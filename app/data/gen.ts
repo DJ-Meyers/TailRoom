@@ -2,9 +2,27 @@ import { Generations, toID } from '@smogon/calc';
 
 export const gen = Generations.get(9);
 
+/** Smogon Create-A-Pokemon (CAP) fakemon included in @smogon/calc but not real Pokemon. */
+const CAP_IDS = new Set([
+  'ababo', 'argalis', 'arghonaut', 'astrolotl', 'aurumoth', 'brattler', 'breezi',
+  'caimanoe', 'caribolt', 'cawdet', 'cawmodore', 'chromera', 'colossoil', 'coribalis',
+  'cresceidon', 'crucibelle', 'crucibellemega', 'cupra', 'cyclohm', 'dorsoil', 'duohm',
+  'electrelk', 'embirch', 'equilibra', 'fawnifer', 'fidgit', 'flarelm', 'floatoy',
+  'hemogoblin', 'jumbao', 'justyke', 'kerfluffle', 'kitsunoh', 'krilowatt', 'malaconda',
+  'miasmaw', 'miasmite', 'mollux', 'monohm', 'mumbao', 'naviathan', 'necturine',
+  'necturna', 'nohface', 'pajantom', 'plasmanta', 'pluffle', 'privatyke', 'protowatt',
+  'pyroak', 'rebble', 'revenankh', 'saharaja', 'saharascal', 'scattervein', 'scratchet',
+  'smogecko', 'smoguana', 'smokomodo', 'snaelstrom', 'snugglow', 'solotl', 'stratagem',
+  'swirlpool', 'syclant', 'syclar', 'tactite', 'tomohawk', 'venomicon',
+  'venomiconepilog', 'venomiconepilogu', 'venomiconepilogue', 'volkraken', 'volkritter',
+  'voodoll', 'voodoom',
+]);
+
 export const speciesList: string[] = [];
 for (const s of gen.species) {
-  speciesList.push(s.name);
+  if (!CAP_IDS.has(toID(s.name))) {
+    speciesList.push(s.name);
+  }
 }
 speciesList.sort();
 
