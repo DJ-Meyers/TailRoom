@@ -198,7 +198,7 @@ function IndexPage() {
           Wolfe&apos;s Incineroar &mdash; adjust the spread and calcs below
         </p>
 
-        <div className="flex gap-6 items-start max-md:flex-col mb-6">
+        <div className="flex gap-6 items-start max-md:flex-col max-md:items-stretch mb-6">
           <div className="flex-1 min-w-0">
             <PokemonPanel
               label="Your Pokemon"
@@ -237,7 +237,7 @@ function IndexPage() {
             onNotesChange={speed.updateNotes}
           />
         </div>
-        <div className="flex gap-6 items-start max-md:flex-col">
+        <div className="flex gap-6 items-start max-md:flex-col max-md:items-stretch">
           <CalcColumn
             title="Offensive Calcs"
             mode="offensive"

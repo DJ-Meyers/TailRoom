@@ -27,7 +27,7 @@ export const TeamCalcView = ({ pokemonId }: { pokemonId: string }) => {
 
   return (
     <div>
-      <div className="flex gap-6 items-start mb-6 max-md:flex-col">
+      <div className="flex gap-6 items-start mb-6 max-md:flex-col max-md:items-stretch">
         <div className="flex-1 min-w-0">
           <PokemonPanel
             label="Your Pokemon"
@@ -72,7 +72,7 @@ export const TeamCalcView = ({ pokemonId }: { pokemonId: string }) => {
           />
         </div>
       </div>
-      <div className="flex gap-6 items-start max-md:flex-col">
+      <div className="flex gap-6 items-start max-md:flex-col max-md:items-stretch">
         <CalcColumn
           title="Offensive Calcs"
           mode="offensive"
