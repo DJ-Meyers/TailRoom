@@ -460,7 +460,7 @@ describe('parseInput', () => {
       const r = parseInput('Beads of Ruin chi-yu');
       // Ruin phrases are consumed in Pass 1 as field conditions
       expect(r.ability).toBeUndefined();
-      expect(r.fieldConditions?.isBeadsOfRuin).toBe(true);
+      expect(r.fieldConditions?.ruinAbilities?.beads).toBe(true);
     });
 
     it('does not auto-enable regular abilities', () => {
@@ -567,62 +567,62 @@ describe('parseInput', () => {
     });
 
     describe('ruin phrases', () => {
-      it('"beads of ruin" sets isBeadsOfRuin', () => {
+      it('"beads of ruin" sets ruinAbilities.beads', () => {
         const r = parseInput('beads of ruin Gardevoir');
-        expect(r.fieldConditions?.isBeadsOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.beads).toBe(true);
       });
 
-      it('"sword of ruin" sets isSwordOfRuin', () => {
+      it('"sword of ruin" sets ruinAbilities.sword', () => {
         const r = parseInput('sword of ruin Garchomp');
-        expect(r.fieldConditions?.isSwordOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.sword).toBe(true);
       });
 
-      it('"tablets of ruin" sets isTabletsOfRuin', () => {
+      it('"tablets of ruin" sets ruinAbilities.tablets', () => {
         const r = parseInput('tablets of ruin Garchomp');
-        expect(r.fieldConditions?.isTabletsOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.tablets).toBe(true);
       });
 
-      it('"vessel of ruin" sets isVesselOfRuin', () => {
+      it('"vessel of ruin" sets ruinAbilities.vessel', () => {
         const r = parseInput('vessel of ruin Garchomp');
-        expect(r.fieldConditions?.isVesselOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.vessel).toBe(true);
       });
 
       it('ruin phrase does not consume the ability slot', () => {
         const r = parseInput('Protosynthesis beads of ruin Flutter Mane');
         expect(r.ability).toBe('Protosynthesis');
-        expect(r.fieldConditions?.isBeadsOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.beads).toBe(true);
       });
     });
 
     describe('side conditions', () => {
-      it('"helping hand" sets attackerSide.isHelpingHand', () => {
+      it('"helping hand" sets attackerSide.helpingHand', () => {
         const r = parseInput('helping hand Garchomp Earthquake');
-        expect(r.fieldConditions?.attackerSide?.isHelpingHand).toBe(true);
+        expect(r.fieldConditions?.attackerSide?.helpingHand).toBe(true);
       });
 
-      it('"light screen" sets defenderSide.isLightScreen', () => {
+      it('"light screen" sets defenderSide.lightScreen', () => {
         const r = parseInput('light screen Blissey');
-        expect(r.fieldConditions?.defenderSide?.isLightScreen).toBe(true);
+        expect(r.fieldConditions?.defenderSide?.lightScreen).toBe(true);
       });
 
-      it('"aurora veil" sets defenderSide.isAuroraVeil', () => {
+      it('"aurora veil" sets defenderSide.auroraVeil', () => {
         const r = parseInput('aurora veil Blissey');
-        expect(r.fieldConditions?.defenderSide?.isAuroraVeil).toBe(true);
+        expect(r.fieldConditions?.defenderSide?.auroraVeil).toBe(true);
       });
 
-      it('"reflect" sets defenderSide.isReflect', () => {
+      it('"reflect" sets defenderSide.reflect', () => {
         const r = parseInput('reflect Corviknight');
-        expect(r.fieldConditions?.defenderSide?.isReflect).toBe(true);
+        expect(r.fieldConditions?.defenderSide?.reflect).toBe(true);
       });
 
-      it('"tailwind" sets attackerSide.isTailwind', () => {
+      it('"tailwind" sets attackerSide.tailwind', () => {
         const r = parseInput('tailwind Garchomp');
-        expect(r.fieldConditions?.attackerSide?.isTailwind).toBe(true);
+        expect(r.fieldConditions?.attackerSide?.tailwind).toBe(true);
       });
 
-      it('"friend guard" sets defenderSide.isFriendGuard', () => {
+      it('"friend guard" sets defenderSide.friendGuard', () => {
         const r = parseInput('friend guard Blissey');
-        expect(r.fieldConditions?.defenderSide?.isFriendGuard).toBe(true);
+        expect(r.fieldConditions?.defenderSide?.friendGuard).toBe(true);
       });
     });
 
@@ -660,9 +660,9 @@ describe('parseInput', () => {
         expect(r.fieldConditions?.terrain).toBe('Electric');
       });
 
-      it('Beads of Ruin ability derives isBeadsOfRuin', () => {
+      it('Beads of Ruin ability derives ruinAbilities.beads', () => {
         const r = parseInput('Beads of Ruin Chi-Yu');
-        expect(r.fieldConditions?.isBeadsOfRuin).toBe(true);
+        expect(r.fieldConditions?.ruinAbilities?.beads).toBe(true);
       });
 
       it('explicit weather overrides ability derivation', () => {
@@ -780,7 +780,7 @@ describe('parseModifiers', () => {
   it('parses helping hand + move', () => {
     const r = parseModifiers('helping hand Moonblast');
     expect(r.move).toBe('Moonblast');
-    expect(r.fieldConditions?.attackerSide?.isHelpingHand).toBe(true);
+    expect(r.fieldConditions?.attackerSide?.helpingHand).toBe(true);
   });
 
   it('does not assign species/item/ability fields', () => {
@@ -838,7 +838,7 @@ describe('parseVsInput', () => {
   it('merges field conditions from both sides', () => {
     const r = parseVsInput('sun Garchomp Earthquake vs reflect Corviknight');
     expect(r.fieldConditions.weather).toBe('Sun');
-    expect(r.fieldConditions.defenderSide?.isReflect).toBe(true);
+    expect(r.fieldConditions.defenderSide?.reflect).toBe(true);
   });
 
   it('parses the full example string', () => {
@@ -850,7 +850,7 @@ describe('parseVsInput', () => {
     expect(r.attacker.ability).toBe('Protosynthesis');
     expect(r.attacker.abilityOn).toBe(true);
     expect(r.attacker.evs?.spa).toBe(252);
-    expect(r.fieldConditions.isBeadsOfRuin).toBe(true);
+    expect(r.fieldConditions.ruinAbilities?.beads).toBe(true);
     expect(r.fieldConditions.terrain).toBe('Psychic');
     expect(r.defender.species).toBe('Urshifu-Rapid-Strike');
     expect(r.defender.evs?.spd).toBe(4);

@@ -98,11 +98,11 @@ export const ABILITY_ON_LIST = new Set([
 
 // --- Field condition keywords ---
 
-export const RUIN_PHRASES: Record<string, keyof FieldConditions> = {
-  'beads of ruin': 'isBeadsOfRuin',
-  'sword of ruin': 'isSwordOfRuin',
-  'tablets of ruin': 'isTabletsOfRuin',
-  'vessel of ruin': 'isVesselOfRuin',
+export const RUIN_PHRASES: Record<string, 'beads' | 'sword' | 'tablets' | 'vessel'> = {
+  'beads of ruin': 'beads',
+  'sword of ruin': 'sword',
+  'tablets of ruin': 'tablets',
+  'vessel of ruin': 'vessel',
 };
 
 export const TERRAIN_PHRASES: Record<string, FieldConditions['terrain']> = {
@@ -113,10 +113,10 @@ export const TERRAIN_PHRASES: Record<string, FieldConditions['terrain']> = {
 };
 
 export const SIDE_CONDITION_PHRASES: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
-  'helping hand': { field: 'attackerSide', key: 'isHelpingHand' },
-  'light screen': { field: 'defenderSide', key: 'isLightScreen' },
-  'aurora veil': { field: 'defenderSide', key: 'isAuroraVeil' },
-  'friend guard': { field: 'defenderSide', key: 'isFriendGuard' },
+  'helping hand': { field: 'attackerSide', key: 'helpingHand' },
+  'light screen': { field: 'defenderSide', key: 'lightScreen' },
+  'aurora veil': { field: 'defenderSide', key: 'auroraVeil' },
+  'friend guard': { field: 'defenderSide', key: 'friendGuard' },
 };
 
 export const WEATHER_KEYWORDS: Record<string, FieldConditions['weather']> = {
@@ -128,8 +128,8 @@ export const WEATHER_KEYWORDS: Record<string, FieldConditions['weather']> = {
 };
 
 export const SINGLE_SIDE_CONDITIONS: Record<string, { field: 'attackerSide' | 'defenderSide'; key: string }> = {
-  reflect: { field: 'defenderSide', key: 'isReflect' },
-  tailwind: { field: 'attackerSide', key: 'isTailwind' },
+  reflect: { field: 'defenderSide', key: 'reflect' },
+  tailwind: { field: 'attackerSide', key: 'tailwind' },
 };
 
 export const ABILITY_FIELD_MAP: Record<string, (fc: FieldConditions) => void> = {
@@ -139,10 +139,10 @@ export const ABILITY_FIELD_MAP: Record<string, (fc: FieldConditions) => void> = 
   'Sand Stream': (fc) => { if (!fc.weather) fc.weather = 'Sand'; },
   'Snow Warning': (fc) => { if (!fc.weather) fc.weather = 'Snow'; },
   'Hadron Engine': (fc) => { if (!fc.terrain) fc.terrain = 'Electric'; },
-  'Beads of Ruin': (fc) => { fc.isBeadsOfRuin = true; },
-  'Sword of Ruin': (fc) => { fc.isSwordOfRuin = true; },
-  'Tablets of Ruin': (fc) => { fc.isTabletsOfRuin = true; },
-  'Vessel of Ruin': (fc) => { fc.isVesselOfRuin = true; },
+  'Beads of Ruin': (fc) => { if (!fc.ruinAbilities) fc.ruinAbilities = {}; fc.ruinAbilities.beads = true; },
+  'Sword of Ruin': (fc) => { if (!fc.ruinAbilities) fc.ruinAbilities = {}; fc.ruinAbilities.sword = true; },
+  'Tablets of Ruin': (fc) => { if (!fc.ruinAbilities) fc.ruinAbilities = {}; fc.ruinAbilities.tablets = true; },
+  'Vessel of Ruin': (fc) => { if (!fc.ruinAbilities) fc.ruinAbilities = {}; fc.ruinAbilities.vessel = true; },
 };
 
 // --- Nature tables ---

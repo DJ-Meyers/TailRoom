@@ -1,24 +1,7 @@
 import { createContext } from "react";
+import type { FieldConditions } from "~/types/field-conditions";
 
-export interface FieldConditions {
-  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow' | 'Hail';
-  terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
-  isBeadsOfRuin?: boolean;
-  isSwordOfRuin?: boolean;
-  isTabletsOfRuin?: boolean;
-  isVesselOfRuin?: boolean;
-  attackerSide?: {
-    isHelpingHand?: boolean;
-    isTailwind?: boolean;
-  };
-  defenderSide?: {
-    isReflect?: boolean;
-    isLightScreen?: boolean;
-    isAuroraVeil?: boolean;
-    isFriendGuard?: boolean;
-    isTailwind?: boolean;
-  };
-}
+export type { FieldConditions } from "~/types/field-conditions";
 
 interface CalcFieldConditionsContextValue {
   fieldConditionsState: FieldConditions;

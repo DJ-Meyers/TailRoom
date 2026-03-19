@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useMemo } from 'react';
 
 import { CalcFieldConditionsProvider } from '~/context/CalcFieldConditionsContext';
-import type { FieldConditions } from '~/context/CalcFieldConditionsContext';
+import type { FieldConditions } from '~/types';
 import { FieldConditionsSection } from '~/components/Calculator/FieldConditionsSection';
 import { ItemIcon } from '~/components/ItemIcon';
 import { Modal } from '~/components/Modal';

@@ -321,7 +321,8 @@ export const parseInput = (input: string, context?: ParseContext): ParseResult =
       const ruinKey = RUIN_PHRASES[threeWord];
       if (ruinKey) {
         if (!result.fieldConditions) result.fieldConditions = {};
-        (result.fieldConditions as any)[ruinKey] = true;
+        if (!result.fieldConditions.ruinAbilities) result.fieldConditions.ruinAbilities = {};
+        result.fieldConditions.ruinAbilities[ruinKey] = true;
         consumed[i] = consumed[i + 1] = consumed[i + 2] = true;
         continue;
       }
@@ -630,7 +631,8 @@ export const parseModifiers = (input: string, context?: ParseContext): ParseResu
       const ruinKey = RUIN_PHRASES[threeWord];
       if (ruinKey) {
         if (!result.fieldConditions) result.fieldConditions = {};
-        (result.fieldConditions as any)[ruinKey] = true;
+        if (!result.fieldConditions.ruinAbilities) result.fieldConditions.ruinAbilities = {};
+        result.fieldConditions.ruinAbilities[ruinKey] = true;
         consumed[i] = consumed[i + 1] = consumed[i + 2] = true;
         continue;
       }
@@ -755,10 +757,14 @@ export const parseModifiers = (input: string, context?: ParseContext): ParseResu
 export const mergeFieldConditions = (a: FieldConditions, b: FieldConditions): FieldConditions => ({
     weather: b.weather ?? a.weather,
     terrain: b.terrain ?? a.terrain,
-    isBeadsOfRuin: a.isBeadsOfRuin || b.isBeadsOfRuin || undefined,
-    isSwordOfRuin: a.isSwordOfRuin || b.isSwordOfRuin || undefined,
-    isTabletsOfRuin: a.isTabletsOfRuin || b.isTabletsOfRuin || undefined,
-    isVesselOfRuin: a.isVesselOfRuin || b.isVesselOfRuin || undefined,
+    ruinAbilities: a.ruinAbilities || b.ruinAbilities
+      ? {
+          beads: a.ruinAbilities?.beads || b.ruinAbilities?.beads || undefined,
+          sword: a.ruinAbilities?.sword || b.ruinAbilities?.sword || undefined,
+          tablets: a.ruinAbilities?.tablets || b.ruinAbilities?.tablets || undefined,
+          vessel: a.ruinAbilities?.vessel || b.ruinAbilities?.vessel || undefined,
+        }
+      : undefined,
     attackerSide: a.attackerSide || b.attackerSide
       ? { ...a.attackerSide, ...b.attackerSide }
       : undefined,

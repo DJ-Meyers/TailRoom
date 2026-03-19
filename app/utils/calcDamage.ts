@@ -97,12 +97,21 @@ export const computeDamage = (
       gameType: 'Doubles',
       weather: field.weather,
       terrain: field.terrain,
-      isBeadsOfRuin: field.isBeadsOfRuin,
-      isSwordOfRuin: field.isSwordOfRuin,
-      isTabletsOfRuin: field.isTabletsOfRuin,
-      isVesselOfRuin: field.isVesselOfRuin,
-      attackerSide: field.attackerSide,
-      defenderSide: field.defenderSide,
+      isBeadsOfRuin: field.ruinAbilities?.beads,
+      isSwordOfRuin: field.ruinAbilities?.sword,
+      isTabletsOfRuin: field.ruinAbilities?.tablets,
+      isVesselOfRuin: field.ruinAbilities?.vessel,
+      attackerSide: field.attackerSide && {
+        isHelpingHand: field.attackerSide.helpingHand,
+        isTailwind: field.attackerSide.tailwind,
+      },
+      defenderSide: field.defenderSide && {
+        isReflect: field.defenderSide.reflect,
+        isLightScreen: field.defenderSide.lightScreen,
+        isAuroraVeil: field.defenderSide.auroraVeil,
+        isFriendGuard: field.defenderSide.friendGuard,
+        isTailwind: field.defenderSide.tailwind,
+      },
     });
     const result = calculate(gen, atkPoke, defPoke, move, calcField);
 

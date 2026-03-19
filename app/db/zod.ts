@@ -15,25 +15,27 @@ export const statsTableSchema = z.object({
 });
 
 const attackerSideSchema = z.object({
-  isHelpingHand: z.boolean().optional(),
-  isTailwind: z.boolean().optional(),
+  helpingHand: z.boolean().optional(),
+  tailwind: z.boolean().optional(),
 });
 
 const defenderSideSchema = z.object({
-  isReflect: z.boolean().optional(),
-  isLightScreen: z.boolean().optional(),
-  isAuroraVeil: z.boolean().optional(),
-  isFriendGuard: z.boolean().optional(),
-  isTailwind: z.boolean().optional(),
+  reflect: z.boolean().optional(),
+  lightScreen: z.boolean().optional(),
+  auroraVeil: z.boolean().optional(),
+  friendGuard: z.boolean().optional(),
+  tailwind: z.boolean().optional(),
 });
 
 export const fieldConditionsSchema = z.object({
   weather: z.enum(['Sun', 'Rain', 'Sand', 'Snow', 'Hail']).optional(),
   terrain: z.enum(['Electric', 'Grassy', 'Psychic', 'Misty']).optional(),
-  isBeadsOfRuin: z.boolean().optional(),
-  isSwordOfRuin: z.boolean().optional(),
-  isTabletsOfRuin: z.boolean().optional(),
-  isVesselOfRuin: z.boolean().optional(),
+  ruinAbilities: z.object({
+    beads: z.boolean().optional(),
+    sword: z.boolean().optional(),
+    tablets: z.boolean().optional(),
+    vessel: z.boolean().optional(),
+  }).optional(),
   attackerSide: attackerSideSchema.optional(),
   defenderSide: defenderSideSchema.optional(),
 });
