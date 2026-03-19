@@ -1,3 +1,5 @@
+import type { FieldConditions } from '~/context/CalcFieldConditionsContext';
+
 export type StatKey = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
 
 export type SpeedTier = 'faster' | 'tie' | 'slower';
@@ -28,25 +30,7 @@ export interface PokemonState {
   boostedStat: string;
 }
 
-export interface FieldConditions {
-  weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow' | 'Hail';
-  terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
-  isBeadsOfRuin?: boolean;
-  isSwordOfRuin?: boolean;
-  isTabletsOfRuin?: boolean;
-  isVesselOfRuin?: boolean;
-  attackerSide?: {
-    isHelpingHand?: boolean;
-    isTailwind?: boolean;
-  };
-  defenderSide?: {
-    isReflect?: boolean;
-    isLightScreen?: boolean;
-    isAuroraVeil?: boolean;
-    isFriendGuard?: boolean;
-    isTailwind?: boolean;
-  };
-}
+export type { FieldConditions } from '~/context/CalcFieldConditionsContext';
 
 export interface ParseResult {
   species?: string;
