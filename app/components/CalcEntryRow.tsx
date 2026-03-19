@@ -12,6 +12,7 @@ import { PokemonPanel } from '~/components/PokemonPanel';
 import { SelectedPokemonModifierInputs } from '~/components/SelectedPokemonModifierInputs';
 import { TargetModifierInputs } from '~/components/TargetModifierInputs';
 import { TypeIcon } from '~/components/TypeIcon';
+import { ReflectIcon, LightScreenIcon, AuroraVeilIcon } from '~/components/ScreenIcon';
 import { WeatherIcon } from '~/components/WeatherIcon';
 import { gen, getSpeciesAbilities } from '~/data/gen';
 import type { CalcEntry, PokemonState, SelectedPokemonModifiers, StatKey } from '~/types';
@@ -75,8 +76,8 @@ const formatSummary = (
   fieldConditions: FieldConditions,
 ): ReactNode => {
   if (!result) {
-    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{moveName} {defender.teraType && <TypeIcon typeName={defender.teraType} />}<ItemIcon item={defender.item} /><PokemonIcon species={defender.species} /></>;
-    return <><WeatherIcon weather={fieldConditions.weather} />{attacker.teraType && <TypeIcon typeName={attacker.teraType} />}<ItemIcon item={attacker.item} /><PokemonIcon species={attacker.species} /> {moveName}</>;
+    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{moveName} {fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{defender.teraType && <TypeIcon typeName={defender.teraType} />}<ItemIcon item={defender.item} /><PokemonIcon species={defender.species} /></>;
+    return <><WeatherIcon weather={fieldConditions.weather} />{fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{attacker.teraType && <TypeIcon typeName={attacker.teraType} />}<ItemIcon item={attacker.item} /><PokemonIcon species={attacker.species} /> {moveName}</>;
   }
 
   const pct = (val: number) => ((val / defenderMaxHp) * 100).toFixed(1);
@@ -129,13 +130,18 @@ const formatSummary = (
   const iconClass = "shrink-0 relative inline-block w-[2.4em] h-[2em] overflow-hidden align-middle";
 
   const weatherIcon = <WeatherIcon weather={fieldConditions.weather} />;
+  const screenIcons = <>
+    {fieldConditions.defenderSide?.reflect && <ReflectIcon />}
+    {fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}
+    {fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}
+  </>;
 
   if (mode === 'offensive') {
     return <span className="flex items-center gap-1 min-w-0">
       {weatherIcon}
       <span className="shrink-0">{atkPrefix}{moveName}</span>
       <span className="shrink-0 text-text-faint">vs</span>
-      {defTera}<ItemIcon item={defender.item} />
+      {screenIcons}{defTera}<ItemIcon item={defender.item} />
       <PokemonIcon species={defender.species} className={iconClass} />
       <span className="min-w-0">
         <div className="truncate">{defDesc}</div>
@@ -144,7 +150,7 @@ const formatSummary = (
     </span>;
   }
   return <span className="flex items-center gap-1 min-w-0">
-    {weatherIcon}
+    {weatherIcon}{screenIcons}
     {atkTeraIcon}<ItemIcon item={attacker.item} />
     <PokemonIcon species={attacker.species} className={iconClass} />
     <span className="min-w-0">
