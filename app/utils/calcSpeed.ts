@@ -14,7 +14,7 @@ const WEATHER_SPEED_ABILITIES: Record<string, string> = {
 export const computeEffectiveSpeed = (
   pokemon: PokemonState,
   conditions: SpeedConditions,
-  isMySide: boolean,
+  hasTailwind: boolean,
 ): number => {
   try {
     const poke = new Pokemon(gen, pokemon.species, {
@@ -43,7 +43,6 @@ export const computeEffectiveSpeed = (
     };
 
     // Tailwind: 2x
-    const hasTailwind = isMySide ? conditions.yourTailwind : conditions.enemyTailwind;
     if (hasTailwind) {
       speed = Math.floor(speed * 2);
     }

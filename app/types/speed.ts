@@ -8,11 +8,12 @@ export interface SpeedEntry {
   notes: string;
   pokemon: PokemonState;
   isExpanded: boolean;
+  tailwind: boolean;
 }
 
 export interface SpeedConditions {
   yourTailwind: boolean;
-  enemyTailwind: boolean;
+  yourBoost: number;
   weather?: 'Sun' | 'Rain' | 'Sand' | 'Snow' | 'Hail';
   terrain?: 'Electric' | 'Grassy' | 'Psychic' | 'Misty';
 }

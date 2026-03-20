@@ -4,6 +4,7 @@ import { ItemIcon } from '~/components/ItemIcon';
 import { Modal } from '~/components/Modal';
 import { PokemonIcon } from '~/components/PokemonIcon';
 import { PokemonPanel } from '~/components/PokemonPanel';
+import { WindIcon } from '~/components/WindIcon';
 import { getSpeciesAbilities } from '~/data/gen';
 import type { PokemonState, SpeedEntry, SpeedTier, StatKey } from '~/types';
 import type { ParseResult } from '~/types';
@@ -12,6 +13,8 @@ interface Props {
   entry: SpeedEntry;
   speed: number;
   tier: SpeedTier;
+  hasTailwind?: boolean;
+  onToggleTailwind: () => void;
   onToggleExpanded: () => void;
   onRemove: () => void;
   onSpeciesChange: (species: string) => void;
@@ -52,6 +55,8 @@ export const SpeedEntryRow = ({
   entry,
   speed,
   tier,
+  hasTailwind,
+  onToggleTailwind,
   onToggleExpanded,
   onRemove,
   onSpeciesChange,
@@ -98,6 +103,32 @@ export const SpeedEntryRow = ({
         {entry.name && <span className="text-sm font-semibold text-text-heading">{entry.name}</span>}
         <span className="flex-1" />
         <span className="shrink-0 text-xs text-text-dim">{formatSpeedEvHint(pokemon)}</span>
+        <select
+          value={pokemon.boosts.spe}
+          onChange={(e) => {
+            e.stopPropagation();
+            onBoostChange('spe', Number(e.target.value));
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className={`shrink-0 w-12 bg-surface border border-border rounded px-0.5 py-0.5 text-xs text-center focus:outline-none focus:border-primary ${pokemon.boosts.spe !== 0 ? 'text-text' : 'text-text-faint'}`}
+          title="Speed boost"
+        >
+          {[-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6].map((v) => (
+            <option key={v} value={v}>
+              {v >= 0 ? `+${v}` : String(v)}
+            </option>
+          ))}
+        </select>
+        <button
+          className={`shrink-0 bg-none border-none cursor-pointer px-0.5 leading-none ${hasTailwind ? 'opacity-30' : 'opacity-100'}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleTailwind();
+          }}
+          title="Toggle tailwind"
+        >
+          <WindIcon />
+        </button>
         <span className={`shrink-0 text-sm font-semibold tabular-nums ${tierColor}`}>
           {speed}
         </span>

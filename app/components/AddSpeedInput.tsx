@@ -23,6 +23,7 @@ export const AddSpeedInput = ({ onAdd }: Props) => {
           { unmatched: [] },
         ),
         isExpanded: false,
+      tailwind: false,
       });
       return;
     }
@@ -38,6 +39,7 @@ export const AddSpeedInput = ({ onAdd }: Props) => {
       notes: '',
       pokemon: pokemonState,
       isExpanded: false,
+      tailwind: false,
     });
 
     setText('');

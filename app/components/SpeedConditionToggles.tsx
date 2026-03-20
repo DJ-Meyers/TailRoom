@@ -2,6 +2,7 @@ import type { SpeedConditions } from '~/types';
 
 const WEATHER_OPTIONS: SpeedConditions['weather'][] = ['Sun', 'Rain', 'Sand', 'Snow'];
 const TERRAIN_OPTIONS: SpeedConditions['terrain'][] = ['Electric', 'Grassy', 'Psychic', 'Misty'];
+const BOOST_VALUES = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
 
 interface Props {
   conditions: SpeedConditions;
@@ -19,15 +20,17 @@ export const SpeedConditionToggles = ({ conditions, onChange }: Props) => (
       />
       Your Tailwind
     </label>
-    <label className="text-xs cursor-pointer flex items-center gap-1 whitespace-nowrap">
-      <input
-        type="checkbox"
-        checked={conditions.enemyTailwind}
-        onChange={() => onChange({ ...conditions, enemyTailwind: !conditions.enemyTailwind })}
-        className="w-auto"
-      />
-      Enemy Tailwind
-    </label>
+    <select
+      value={conditions.yourBoost ?? 0}
+      onChange={(e) => onChange({ ...conditions, yourBoost: Number(e.target.value) })}
+      className="bg-surface border border-border rounded px-1 py-0.5 text-xs text-text focus:outline-none focus:border-primary"
+    >
+      {BOOST_VALUES.map((v) => (
+        <option key={v} value={v}>
+          {v >= 0 ? `+${v} Spe` : `${v} Spe`}
+        </option>
+      ))}
+    </select>
     <select
       value={conditions.weather ?? ''}
       onChange={(e) =>

@@ -13,6 +13,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-2',
@@ -25,6 +26,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-3',
@@ -37,6 +39,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-4',
@@ -49,6 +52,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-5',
@@ -61,6 +65,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-6',
@@ -73,6 +78,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-7',
@@ -85,6 +91,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 4 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-8',
@@ -97,6 +104,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 4 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-9',
@@ -109,6 +117,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 4 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-10',
@@ -122,6 +131,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       ivs: { ...defaultIvs(), spe: 0 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-12',
@@ -134,6 +144,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: defaultEvs(),
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-13',
@@ -146,6 +157,7 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'spd-14',
@@ -158,5 +170,6 @@ export const DEFAULT_SPEED_ENTRIES: SpeedEntry[] = [
       evs: { ...defaultEvs(), spe: 252 },
     }),
     isExpanded: false,
+    tailwind: false,
   },
 ];

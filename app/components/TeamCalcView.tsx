@@ -62,6 +62,7 @@ export const TeamCalcView = ({ pokemonId }: { pokemonId: string }) => {
             onAdd={speed.add}
             onRemove={speed.remove}
             onToggleExpanded={speed.toggleExpanded}
+            onToggleTailwind={speed.toggleTailwind}
             onSpeciesChange={speed.setSpecies}
             onPokemonUpdate={speed.updatePokemon}
             onEvChange={speed.setEv}

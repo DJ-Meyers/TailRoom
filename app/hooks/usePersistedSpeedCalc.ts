@@ -13,6 +13,7 @@ type Action =
   | { type: 'ADD'; entry: SpeedEntry }
   | { type: 'REMOVE'; id: string }
   | { type: 'TOGGLE_EXPANDED'; id: string }
+  | { type: 'TOGGLE_TAILWIND'; id: string }
   | { type: 'SET_SPECIES'; id: string; species: string }
   | { type: 'UPDATE_POKEMON'; id: string; patch: Partial<PokemonState> }
   | { type: 'SET_EV'; id: string; stat: StatKey; value: number }
@@ -35,6 +36,11 @@ const reducer = (state: SpeedEntry[], action: Action): SpeedEntry[] => {
     case 'TOGGLE_EXPANDED':
       return state.map((e) =>
         e.id === action.id ? { ...e, isExpanded: !e.isExpanded } : e,
+      );
+
+    case 'TOGGLE_TAILWIND':
+      return state.map((e) =>
+        e.id === action.id ? { ...e, tailwind: !e.tailwind } : e,
       );
 
     case 'SET_SPECIES': {
@@ -126,7 +132,7 @@ export const usePersistedSpeedCalc = (pokemonId: string) => {
   const [entries, dispatch] = useReducer(reducer, []);
   const [conditions, setConditions] = useState<SpeedConditions>({
     yourTailwind: false,
-    enemyTailwind: false,
+    yourBoost: 0,
   });
   const initialized = useRef(false);
   const pendingUpdates = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -233,6 +239,10 @@ export const usePersistedSpeedCalc = (pokemonId: string) => {
     dispatch({ type: 'TOGGLE_EXPANDED', id });
   }, []);
 
+  const toggleTailwind = useCallback((id: string) => {
+    dispatch({ type: 'TOGGLE_TAILWIND', id });
+  }, []);
+
   const setSpecies = useCallback(
     (id: string, species: string) => {
       dispatch({ type: 'SET_SPECIES', id, species });
@@ -296,6 +306,7 @@ export const usePersistedSpeedCalc = (pokemonId: string) => {
     add,
     remove,
     toggleExpanded,
+    toggleTailwind,
     setSpecies,
     updatePokemon,
     setEv,
