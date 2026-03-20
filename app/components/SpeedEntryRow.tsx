@@ -113,7 +113,7 @@ export const SpeedEntryRow = ({
           className={`shrink-0 w-12 bg-surface border border-border rounded px-0.5 py-0.5 text-xs text-center focus:outline-none focus:border-primary ${pokemon.boosts.spe !== 0 ? 'text-text' : 'text-text-faint'}`}
           title="Speed boost"
         >
-          {[-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6].map((v) => (
+          {[6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6].map((v) => (
             <option key={v} value={v}>
               {v >= 0 ? `+${v}` : String(v)}
             </option>

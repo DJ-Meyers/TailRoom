@@ -2,7 +2,7 @@ import type { SpeedConditions } from '~/types';
 
 const WEATHER_OPTIONS: SpeedConditions['weather'][] = ['Sun', 'Rain', 'Sand', 'Snow'];
 const TERRAIN_OPTIONS: SpeedConditions['terrain'][] = ['Electric', 'Grassy', 'Psychic', 'Misty'];
-const BOOST_VALUES = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
+const BOOST_VALUES = [6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6];
 
 interface Props {
   conditions: SpeedConditions;
