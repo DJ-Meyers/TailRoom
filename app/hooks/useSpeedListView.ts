@@ -38,16 +38,19 @@ export const useSpeedListView = (
   const [groupBy, setGroupBy] = useState<SpeedGroupBy>('tier');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Your Pokemon's effective speed
-  const yourSpeed = useMemo(
-    () => computeEffectiveSpeed(selectedPokemon, conditions, true),
-    [selectedPokemon, conditions],
-  );
+  // Your Pokemon's effective speed (apply yourBoost override)
+  const yourSpeed = useMemo(() => {
+    const boosted = {
+      ...selectedPokemon,
+      boosts: { ...selectedPokemon.boosts, spe: (conditions.yourBoost ?? 0) },
+    };
+    return computeEffectiveSpeed(boosted, conditions, conditions.yourTailwind);
+  }, [selectedPokemon, conditions]);
 
   // 1. Enrich — compute speed and classify tier
   const enriched = useMemo(() => {
     return entries.map((entry): EnrichedSpeedEntry => {
-      const speed = computeEffectiveSpeed(entry.pokemon, conditions, false);
+      const speed = computeEffectiveSpeed(entry.pokemon, conditions, entry.tailwind);
       const tier: SpeedTier =
         speed > yourSpeed ? 'faster' : speed === yourSpeed ? 'tie' : 'slower';
       return { entry, speed, tier };

@@ -81,6 +81,7 @@ const SANDBOX_SPEED: SpeedEntry[] = [
     name: 'Max Speed Flutter',
     notes: '',
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'sandbox-spd-2',
@@ -92,6 +93,7 @@ const SANDBOX_SPEED: SpeedEntry[] = [
     name: 'Scarf Urshifu',
     notes: '',
     isExpanded: false,
+    tailwind: false,
   },
   {
     id: 'sandbox-spd-3',
@@ -103,6 +105,7 @@ const SANDBOX_SPEED: SpeedEntry[] = [
     name: 'Rillaboom',
     notes: '',
     isExpanded: false,
+    tailwind: false,
   },
 ]
 
@@ -228,6 +231,7 @@ function IndexPage() {
             onAdd={speed.add}
             onRemove={speed.remove}
             onToggleExpanded={speed.toggleExpanded}
+            onToggleTailwind={speed.toggleTailwind}
             onSpeciesChange={speed.setSpecies}
             onPokemonUpdate={speed.updatePokemon}
             onEvChange={speed.setEv}

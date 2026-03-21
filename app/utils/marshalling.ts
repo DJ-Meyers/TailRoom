@@ -132,6 +132,7 @@ export const dbSpeedEntryToSpeedEntry = (row: DbSpeedEntry): SpeedEntry => ({
     abilityOn: row.abilityOn,
   }),
   isExpanded: false,
+  tailwind: false,
 });
 
 export const dbPokemonToPokemonState = (row: DbPokemon): PokemonState =>

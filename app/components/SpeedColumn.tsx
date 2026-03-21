@@ -2,6 +2,7 @@ import { AddSpeedInput } from '~/components/AddSpeedInput';
 import { SpeedConditionToggles } from '~/components/SpeedConditionToggles';
 import { SpeedEntryRow } from '~/components/SpeedEntryRow';
 import { SpeedListControls } from '~/components/SpeedListControls';
+import { WindIcon } from '~/components/WindIcon';
 import { useSpeedListView } from '~/hooks/useSpeedListView';
 import type { PokemonState, SpeedConditions, SpeedEntry, StatKey } from '~/types';
 
@@ -13,6 +14,7 @@ interface Props {
   onAdd: (entry: Omit<SpeedEntry, 'id'>) => void;
   onRemove: (id: string) => void;
   onToggleExpanded: (id: string) => void;
+  onToggleTailwind: (id: string) => void;
   onSpeciesChange: (id: string, species: string) => void;
   onPokemonUpdate: (id: string, patch: Partial<PokemonState>) => void;
   onEvChange: (id: string, stat: StatKey, value: number) => void;
@@ -30,6 +32,7 @@ export const SpeedColumn = ({
   onAdd,
   onRemove,
   onToggleExpanded,
+  onToggleTailwind,
   onSpeciesChange,
   onPokemonUpdate,
   onEvChange,
@@ -46,7 +49,7 @@ export const SpeedColumn = ({
       <h3 className="sticky top-0 z-10 bg-bg text-base text-text-heading mb-3 pb-2 border-b-2 border-primary">Speed Calcs</h3>
       <SpeedConditionToggles conditions={conditions} onChange={onConditionsChange} />
       <div className="text-sm text-text-dim mb-2">
-        Your speed: <span className="font-semibold text-text">{yourSpeed}</span>
+        Your speed: {conditions.yourTailwind && <WindIcon />}<span className="font-semibold text-text">{yourSpeed}</span>
       </div>
       <AddSpeedInput onAdd={onAdd} />
       <SpeedListControls
@@ -68,6 +71,8 @@ export const SpeedColumn = ({
               entry={entry}
               speed={speed}
               tier={tier}
+              hasTailwind={entry.tailwind}
+              onToggleTailwind={() => onToggleTailwind(entry.id)}
               onToggleExpanded={() => onToggleExpanded(entry.id)}
               onRemove={() => onRemove(entry.id)}
               onSpeciesChange={(species) => onSpeciesChange(entry.id, species)}
