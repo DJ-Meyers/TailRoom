@@ -2,7 +2,6 @@ import type { ComponentType, SVGProps } from 'react';
 
 import FishIcon from '~/assets/fish.svg?react';
 import SwordIcon from '~/assets/sword.svg?react';
-import TabletIcon from '~/assets/tablet.svg?react';
 import TabletsIcon from '~/assets/tablets.svg?react';
 import VesselIcon from '~/assets/vessel.svg?react';
 
