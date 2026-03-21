@@ -1,0 +1,16 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chalice: single continuous path -->
+  <path d="
+    M8,14
+    Q10,30 29,30
+    L29,36
+    Q29,52 17,55
+    Q15,56.5 16,57.5
+    L48,57.5
+    Q49,56.5 47,55
+    Q35,52 35,36
+    L35,30
+    Q54,30 56,14
+    Z
+  " fill="currentColor" />
+</svg>

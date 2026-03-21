@@ -5,6 +5,7 @@ import { config as dotenvConfig } from 'dotenv'
 import path from 'path'
 import type { PluginOption, ViteDevServer } from 'vite'
 import { defineConfig } from 'vite'
+import svgr from 'vite-plugin-svgr'
 
 function trpcDevServer(): PluginOption {
   let envLoaded = false
@@ -56,6 +57,7 @@ export default defineConfig({
       routesDirectory: 'app/routes',
       generatedRouteTree: 'app/routeTree.gen.ts',
     }),
+    svgr(),
     react(),
     trpcDevServer(),
   ],

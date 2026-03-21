@@ -1,0 +1,8 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body: chubby oval -->
+  <ellipse cx="26" cy="32" rx="17" ry="14" fill="currentColor" />
+  <!-- Upper tail fin -->
+  <ellipse cx="46" cy="26" rx="10" ry="6" transform="rotate(-60 46 26)" fill="currentColor" />
+  <!-- Lower tail fin -->
+  <ellipse cx="46" cy="38" rx="10" ry="6" transform="rotate(60 46 38)" fill="currentColor" />
+</svg>
