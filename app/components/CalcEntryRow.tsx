@@ -13,6 +13,7 @@ import { SelectedPokemonModifierInputs } from '~/components/SelectedPokemonModif
 import { TargetModifierInputs } from '~/components/TargetModifierInputs';
 import { TypeIcon } from '~/components/TypeIcon';
 import { ReflectIcon, LightScreenIcon, AuroraVeilIcon } from '~/components/ScreenIcon';
+import { RuinIcon } from '~/components/RuinIcon';
 import { WeatherIcon } from '~/components/WeatherIcon';
 import { GrassyTerrainIcon, ElectricTerrainIcon, PsychicTerrainIcon, MistyTerrainIcon } from '~/components/TerrainIcon';
 import { WindIcon } from '~/components/WindIcon';
@@ -81,8 +82,8 @@ const formatSummary = (
   const tIcon = fieldConditions.terrain ? terrainMap[fieldConditions.terrain] : null;
 
   if (!result) {
-    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{tIcon}{fieldConditions.attackerSide?.tailwind && <WindIcon flipped />}{moveName} {fieldConditions.defenderSide?.tailwind && <WindIcon />}{fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{defender.teraType && <TypeIcon typeName={defender.teraType} />}<ItemIcon item={defender.item} /><PokemonIcon species={defender.species} /></>;
-    return <><WeatherIcon weather={fieldConditions.weather} />{tIcon}{fieldConditions.defenderSide?.tailwind && <WindIcon flipped />}{fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{fieldConditions.attackerSide?.tailwind && <WindIcon />}{attacker.teraType && <TypeIcon typeName={attacker.teraType} />}<ItemIcon item={attacker.item} /><PokemonIcon species={attacker.species} /> {moveName}</>;
+    if (mode === 'offensive') return <><WeatherIcon weather={fieldConditions.weather} />{tIcon}{fieldConditions.ruinAbilities?.sword && <RuinIcon ruin="sword" />}{fieldConditions.ruinAbilities?.beads && <RuinIcon ruin="beads" />}{fieldConditions.ruinAbilities?.tablets && <RuinIcon ruin="tablets" />}{fieldConditions.ruinAbilities?.vessel && <RuinIcon ruin="vessel" />}{fieldConditions.attackerSide?.tailwind && <WindIcon flipped />}{moveName} {fieldConditions.defenderSide?.tailwind && <WindIcon />}{fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{defender.teraType && <TypeIcon typeName={defender.teraType} />}<ItemIcon item={defender.item} /><PokemonIcon species={defender.species} /></>;
+    return <><WeatherIcon weather={fieldConditions.weather} />{tIcon}{fieldConditions.ruinAbilities?.sword && <RuinIcon ruin="sword" />}{fieldConditions.ruinAbilities?.beads && <RuinIcon ruin="beads" />}{fieldConditions.ruinAbilities?.tablets && <RuinIcon ruin="tablets" />}{fieldConditions.ruinAbilities?.vessel && <RuinIcon ruin="vessel" />}{fieldConditions.defenderSide?.tailwind && <WindIcon flipped />}{fieldConditions.defenderSide?.reflect && <ReflectIcon />}{fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}{fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}{fieldConditions.attackerSide?.tailwind && <WindIcon />}{attacker.teraType && <TypeIcon typeName={attacker.teraType} />}<ItemIcon item={attacker.item} /><PokemonIcon species={attacker.species} /> {moveName}</>;
   }
 
   const pct = (val: number) => ((val / defenderMaxHp) * 100).toFixed(1);
@@ -141,10 +142,16 @@ const formatSummary = (
     {fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}
     {fieldConditions.defenderSide?.auroraVeil && <AuroraVeilIcon />}
   </>;
+  const ruinIcons = <>
+    {fieldConditions.ruinAbilities?.sword && <RuinIcon ruin="sword" />}
+    {fieldConditions.ruinAbilities?.beads && <RuinIcon ruin="beads" />}
+    {fieldConditions.ruinAbilities?.tablets && <RuinIcon ruin="tablets" />}
+    {fieldConditions.ruinAbilities?.vessel && <RuinIcon ruin="vessel" />}
+  </>;
 
   if (mode === 'offensive') {
     return <span className="flex items-center gap-1 min-w-0">
-      {weatherIcon}{tIcon}
+      {weatherIcon}{tIcon}{ruinIcons}
       {fieldConditions.attackerSide?.tailwind && <WindIcon flipped />}
       <span className="shrink-0">{atkPrefix}{moveName}</span>
       <span className="shrink-0 text-text-faint">vs</span>
@@ -157,7 +164,7 @@ const formatSummary = (
     </span>;
   }
   return <span className="flex items-center gap-1 min-w-0">
-    {weatherIcon}{tIcon}
+    {weatherIcon}{tIcon}{ruinIcons}
     {fieldConditions.defenderSide?.tailwind && <WindIcon flipped />}
     {fieldConditions.defenderSide?.reflect && <ReflectIcon />}
     {fieldConditions.defenderSide?.lightScreen && <LightScreenIcon />}
