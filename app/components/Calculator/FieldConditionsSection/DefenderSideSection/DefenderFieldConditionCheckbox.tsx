@@ -1,5 +1,6 @@
 import { useFieldConditions } from '~/hooks/Calc/useFieldConditions';
 import type { FieldConditions } from '~/types';
+import { FieldConditionCheckbox } from '../FieldConditionCheckbox';
 
 type DefenderSideKey = keyof NonNullable<FieldConditions['defenderSide']>;
 
@@ -10,12 +11,12 @@ interface Props {
 
 export const DefenderFieldConditionCheckbox: React.FC<Props> = ({ field: sideKey, label }) => {
   const { defenderSide, toggleDefenderSide } = useFieldConditions();
-  const isChecked = !!defenderSide[sideKey];
-  const onChange = () => toggleDefenderSide(sideKey);
 
   return (
-    <label className="text-xs cursor-pointer flex items-center gap-1 whitespace-nowrap">
-      <input type="checkbox" checked={isChecked} onChange={onChange} className="w-auto" /> {label}
-    </label>
+    <FieldConditionCheckbox
+      label={label}
+      checked={!!defenderSide[sideKey]}
+      onChange={() => toggleDefenderSide(sideKey)}
+    />
   );
 };
