@@ -2,7 +2,9 @@ import { toID } from '@smogon/calc';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from 'react';
 
-import { FieldConditionInputs } from '~/components/FieldConditionInputs';
+import { CalcFieldConditionsProvider } from '~/context/CalcFieldConditionsContext';
+import type { FieldConditions } from '~/context/CalcFieldConditionsContext';
+import { FieldConditionsSection } from '~/components/Calculator/FieldConditionsSection';
 import { ItemIcon } from '~/components/ItemIcon';
 import { Modal } from '~/components/Modal';
 import { PokemonIcon } from '~/components/PokemonIcon';
@@ -12,7 +14,7 @@ import { TargetModifierInputs } from '~/components/TargetModifierInputs';
 import { TypeIcon } from '~/components/TypeIcon';
 import { WeatherIcon } from '~/components/WeatherIcon';
 import { gen, getSpeciesAbilities } from '~/data/gen';
-import type { CalcEntry, FieldConditions, PokemonState, SelectedPokemonModifiers, StatKey } from '~/types';
+import type { CalcEntry, PokemonState, SelectedPokemonModifiers, StatKey } from '~/types';
 import { computeDamage, type DamageCalcResult } from '~/utils/calcDamage';
 
 interface Props {
@@ -214,7 +216,15 @@ export const CalcEntryRow = ({
   const abilities = getSpeciesAbilities(entry.opponent.species);
   const prefix = `entry-${entry.id}`;
 
+  const handleFieldConditionChange = useCallback(
+    (patch: Partial<FieldConditions>) => onFieldChange({ ...entry.fieldConditions, ...patch }),
+    [entry.fieldConditions, onFieldChange],
+  );
+
+  // TODO: Eventually this will be a full CalcContext with sub-contexts for each
+  // aspect of the calculation (field conditions, pokemon state, modifiers, etc.)
   return (
+    <CalcFieldConditionsProvider value={{ fieldConditionsState: entry.fieldConditions, onChange: handleFieldConditionChange }}>
     <div className="bg-surface rounded-md mb-2 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none hover:bg-hover-bg" onClick={onToggleExpanded}>
         {entry.name && <span className="shrink-0 text-sm font-semibold text-text-heading">{entry.name}</span>}
@@ -269,11 +279,7 @@ export const CalcEntryRow = ({
           />
           </>
         )}
-        <FieldConditionInputs
-          field={entry.fieldConditions}
-          idPrefix={prefix}
-          onChange={onFieldChange}
-        />
+        <FieldConditionsSection />
         <PokemonPanel
           label={prefix}
           state={entry.opponent}
@@ -302,7 +308,7 @@ export const CalcEntryRow = ({
           onParsed={(parsed) => {
             if (parsed.move && mode === 'offensive') onMoveChange(parsed.move);
             if (parsed.move && mode === 'defensive') onOpponentUpdate({ move: parsed.move });
-            if (parsed.fieldConditions) onFieldChange({ ...entry.fieldConditions, ...parsed.fieldConditions });
+            if (parsed.fieldConditions) handleFieldConditionChange(parsed.fieldConditions);
             const patch: Partial<PokemonState> = {};
             if (parsed.species) patch.species = parsed.species;
             if (parsed.nature) patch.nature = parsed.nature;
@@ -348,5 +354,6 @@ export const CalcEntryRow = ({
         )}
       </Modal>
     </div>
+    </CalcFieldConditionsProvider>
   );
 };
