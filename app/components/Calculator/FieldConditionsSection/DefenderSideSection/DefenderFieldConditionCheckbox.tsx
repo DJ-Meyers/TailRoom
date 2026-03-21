@@ -1,17 +1,17 @@
 import { useFieldConditions } from '~/hooks/Calc/useFieldConditions';
 import type { FieldConditions } from '~/types';
 
-type AttackerSideKey = keyof NonNullable<FieldConditions['attackerSide']>;
+type DefenderSideKey = keyof NonNullable<FieldConditions['defenderSide']>;
 
 interface Props {
-  field: AttackerSideKey;
+  field: DefenderSideKey;
   label: string;
 }
 
-export const AttackerSideInput: React.FC<Props> = ({ field: sideKey, label }) => {
-  const { attackerSide, toggleAttackerSide } = useFieldConditions();
-  const isChecked = !!attackerSide[sideKey];
-  const onChange = () => toggleAttackerSide(sideKey);
+export const DefenderFieldConditionCheckbox: React.FC<Props> = ({ field: sideKey, label }) => {
+  const { defenderSide, toggleDefenderSide } = useFieldConditions();
+  const isChecked = !!defenderSide[sideKey];
+  const onChange = () => toggleDefenderSide(sideKey);
 
   return (
     <label className="text-xs cursor-pointer flex items-center gap-1 whitespace-nowrap">

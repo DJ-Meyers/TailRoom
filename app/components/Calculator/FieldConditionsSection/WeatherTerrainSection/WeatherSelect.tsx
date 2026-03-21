@@ -1,26 +1,17 @@
 import { useFieldConditions } from '~/hooks/Calc/useFieldConditions';
-import type { FieldConditions } from '~/types';
+import { FieldConditionSelect } from './FieldConditionSelect';
 
-const WEATHER_OPTIONS: FieldConditions['weather'][] = ['Sun', 'Rain', 'Sand', 'Snow'];
+const WEATHER_OPTIONS = ['Sun', 'Rain', 'Sand', 'Snow'] as const;
 
 export const WeatherSelect = () => {
   const { weather, setWeather } = useFieldConditions();
-  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setWeather((e.target.value || undefined) as FieldConditions['weather']);
 
   return (
-    <label className="flex flex-col min-w-[100px]">
-      <span className="text-[0.7rem] font-semibold text-text-dim mb-0.5">Weather</span>
-      <select
-        value={weather ?? ''}
-        onChange={onChange}
-        className="px-1 py-0.5 border border-border rounded text-xs bg-surface focus:outline-none focus:border-primary"
-      >
-        <option value="">(none)</option>
-        {WEATHER_OPTIONS.map((w) => (
-          <option key={w} value={w}>{w}</option>
-        ))}
-      </select>
-    </label>
+    <FieldConditionSelect
+      label="Weather"
+      options={WEATHER_OPTIONS}
+      value={weather}
+      onChange={setWeather}
+    />
   );
 };
