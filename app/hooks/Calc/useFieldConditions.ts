@@ -16,8 +16,10 @@ export const useFieldConditions = () => {
   );
 
   const toggleRuin = useCallback(
-    (key: 'isBeadsOfRuin' | 'isSwordOfRuin' | 'isTabletsOfRuin' | 'isVesselOfRuin') =>
-      onChange({ [key]: !fieldConditionsState[key] }),
+    (key: 'beads' | 'sword' | 'tablets' | 'vessel') => {
+      const ruin = fieldConditionsState.ruinAbilities ?? {};
+      onChange({ ruinAbilities: { ...ruin, [key]: !ruin[key] } });
+    },
     [fieldConditionsState, onChange],
   );
 
@@ -40,10 +42,12 @@ export const useFieldConditions = () => {
   return {
     weather: fieldConditionsState.weather,
     terrain: fieldConditionsState.terrain,
-    isBeadsOfRuin: !!fieldConditionsState.isBeadsOfRuin,
-    isSwordOfRuin: !!fieldConditionsState.isSwordOfRuin,
-    isTabletsOfRuin: !!fieldConditionsState.isTabletsOfRuin,
-    isVesselOfRuin: !!fieldConditionsState.isVesselOfRuin,
+    ruinAbilities: {
+      beads: !!fieldConditionsState.ruinAbilities?.beads,
+      sword: !!fieldConditionsState.ruinAbilities?.sword,
+      tablets: !!fieldConditionsState.ruinAbilities?.tablets,
+      vessel: !!fieldConditionsState.ruinAbilities?.vessel,
+    },
     attackerSide: fieldConditionsState.attackerSide ?? {},
     defenderSide: fieldConditionsState.defenderSide ?? {},
     setWeather,

@@ -73,7 +73,7 @@ const INITIAL_DEFENSIVE_ENTRIES: CalcEntry[] = [
       nature: 'Adamant',
       evs: { ...defaultEvs(), atk: 252 },
     }),
-    fieldConditions: { isSwordOfRuin: true },
+    fieldConditions: { ruinAbilities: { sword: true } },
     selectedPokemonModifiers: defaultSelectedPokemonModifiers(),
     isExpanded: false,
   },
