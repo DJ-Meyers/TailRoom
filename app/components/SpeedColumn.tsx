@@ -2,7 +2,7 @@ import { AddSpeedInput } from '~/components/AddSpeedInput';
 import { SpeedConditionToggles } from '~/components/SpeedConditionToggles';
 import { SpeedEntryRow } from '~/components/SpeedEntryRow';
 import { SpeedListControls } from '~/components/SpeedListControls';
-import { WindIcon } from '~/components/WindIcon';
+import { WindIcon } from '~/components/icons';
 import { useSpeedListView } from '~/hooks/useSpeedListView';
 import type { PokemonState, SpeedConditions, SpeedEntry, StatKey } from '~/types';
 
