@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
-import { PokemonIcon } from '~/components/PokemonIcon';
+import { PokemonIcon } from '~/components/icons';
 import { useTRPC } from '~/trpc/client';
 import type { StatsTable } from '~/types';
 

@@ -1,10 +1,8 @@
 import { useCallback } from 'react';
 
-import { ItemIcon } from '~/components/ItemIcon';
+import { ItemIcon, PokemonIcon, WindIcon } from '~/components/icons';
 import { Modal } from '~/components/Modal';
-import { PokemonIcon } from '~/components/PokemonIcon';
 import { PokemonPanel } from '~/components/PokemonPanel';
-import { WindIcon } from '~/components/WindIcon';
 import { getSpeciesAbilities } from '~/data/gen';
 import type { PokemonState, SpeedEntry, SpeedTier, StatKey } from '~/types';
 import type { ParseResult } from '~/types';

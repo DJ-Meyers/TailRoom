@@ -5,18 +5,25 @@ import { useCallback, useMemo } from 'react';
 import { CalcFieldConditionsProvider } from '~/context/CalcFieldConditionsContext';
 import type { FieldConditions } from '~/types';
 import { FieldConditionsSection } from '~/components/Calculator/FieldConditionsSection';
-import { ItemIcon } from '~/components/ItemIcon';
+import {
+  ItemIcon,
+  PokemonIcon,
+  TypeIcon,
+  ReflectIcon,
+  LightScreenIcon,
+  AuroraVeilIcon,
+  RuinIcon,
+  WeatherIcon,
+  GrassyTerrainIcon,
+  ElectricTerrainIcon,
+  PsychicTerrainIcon,
+  MistyTerrainIcon,
+  WindIcon,
+} from '~/components/icons';
 import { Modal } from '~/components/Modal';
-import { PokemonIcon } from '~/components/PokemonIcon';
 import { PokemonPanel } from '~/components/PokemonPanel';
 import { SelectedPokemonModifierInputs } from '~/components/SelectedPokemonModifierInputs';
 import { TargetModifierInputs } from '~/components/TargetModifierInputs';
-import { TypeIcon } from '~/components/TypeIcon';
-import { ReflectIcon, LightScreenIcon, AuroraVeilIcon } from '~/components/ScreenIcon';
-import { RuinIcon } from '~/components/RuinIcon';
-import { WeatherIcon } from '~/components/WeatherIcon';
-import { GrassyTerrainIcon, ElectricTerrainIcon, PsychicTerrainIcon, MistyTerrainIcon } from '~/components/TerrainIcon';
-import { WindIcon } from '~/components/WindIcon';
 import { gen, getSpeciesAbilities } from '~/data/gen';
 import type { CalcEntry, PokemonState, SelectedPokemonModifiers, StatKey } from '~/types';
 import { computeDamage, type DamageCalcResult } from '~/utils/calcDamage';
